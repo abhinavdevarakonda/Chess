@@ -1,19 +1,13 @@
 import time
 import pygame
 
-#black_pawn = bp
-#black_knight = bk
-#black_bishop = bb
-#black_rook = br
-#black_queen = bqueen
-#black_king = bking
+#black_pawn = bp          #white_pawn = wp
+#black_knight = bk        #white_knight = bk
+#black_bishop = bb        #white_bishop = wb
+#black_rook = br          #white_rook = wr
+#black_queen = bqueen     #white_queen = wqueen
+#black_king = bking       #white_king = wking
 
-#white_pawn = wp
-#white_knight = bk
-#white_bishop = wb
-#white_rook = wr
-#white_queen = wqueen
-#white_king = wking
 
 def Board():
     board = []
