@@ -23,4 +23,14 @@ def Board():
     for i in range(8):
         print(board[i],"\n")
 Board()
+def move(initial_x,initial_y,final_x,final_y):
+    board=[]
+    board[final_x][final_y]=board[initial_x][initial_y]
+    board[initial_x][initial_y]=' '
+def pawn_first_move(initial_x,initial_y,final_x,final_y):
+    board=[]
+    board[final_x][final_y]=board[initial_x][initial_y]
+    board[initial_x][initial_y]=' '
+
+
 
