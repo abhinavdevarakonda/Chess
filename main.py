@@ -29,22 +29,44 @@ Clock = pygame.time.Clock()
 #black_rook      #white_rook 
 #black_queen     #white_queen 
 #black_king      #white_king 
+class PIECE:
+    def __init__(self,piece,colour,picture):
+        self.piece = piece
+        self.colour = colour
+        self.picture = picture
 
-
+black_pawn = PIECE('pawn','black','black_pawn.png')
+white_pawn = PIECE('pawn','white','white_pawn.png')
+black_knight = PIECE('knight','black','black_knight.png')
+white_knight = PIECE('knight','white','white_knight.png')
+black_bishop = PIECE('bishop','black','black_bishop')
+white_bishop = PIECE('bishop','white','white_bishop.png')
+black_rook = PIECE('rook','black','black_rook.png')
+white_rook = PIECE('rook','white','white_rook.png')
+black_queen = PIECE('queen','black','black_queen.png')
+white_queen = PIECE('queen','white','white_queen.png')
+black_king = PIECE('king','black','black_king.png')
+white_king = PIECE('king','white','white_king.png')
+empty_square = PIECE('.',' ',' ')
 def Board():
     global board
     board = []
     for i in range(8):
-        board.append([' ',' ',' ',' ',' ',' ',' ',' '])
+        board.append([])
+        for j in range(8):
+            board[i].append(empty_square)
     
     for i in range(8):
-        board[1][i] = 'wp'
-        board[6][i] = 'bp'
+        board[1][i] = white_pawn
+        board[7][i] = black_pawn
     
-    board[0] = ['wr','wk','wb','wking','wqueen','wb','wk','wr']
-    board[7] = ['br','bk','bb','bking','bqueen','bb','bk','br']
+    
+    board[0] = [white_rook,white_knight,white_bishop,white_king,white_queen,white_bishop,white_knight,white_rook]
+    board[6] = [black_rook,black_knight,black_bishop,black_king,black_king,black_bishop,black_knight,black_rook]
     for i in range(8):
-        print(board[i],"\n")
+        print('\n')
+        for j in range(8):
+            print(board[i][j].piece,end=' ')
 Board()
 def move(initial_x,initial_y,final_x,final_y):
     board[final_x][final_y]=board[initial_x][initial_y]
