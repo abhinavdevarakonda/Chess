@@ -84,56 +84,24 @@ Clock = pygame.time.Clock()
 #black_queen     #white_queen 
 #black_king      #white_king 
 
-bp1 = ['black',[1,0]]
-bp2 = ['black',[1,1]]
-bp3 = ['black',[1,2]]
-bp4 = ['black',[1,3]]
-bp5 = ['black',[1,4]]
-bp6 = ['black',[1,5]]
-bp7 = ['black',[1,6]]
-bp8 = ['black',[1,7]]
-bkn1 = ['black',[0,1]]
-bkn2 = ['black',[0,6]]
-bb1 = ['black',[0,2]]
-bb2 = ['black',[0,5]]
-br1 = ['black',[0,0]]
-br2 = ['black',[0,7]]
-bq = ['black',[0,3]]
-bk = ['black',[0,4]]
+black_pawns = ['bp1','bp2','bp3','bp4','bp5','bp6','bp7','bp8']
+white_pawns = ['wp1','wp2','wp3','wp4','wp5','wp6','wp7','wp8']
 
-wp1 = ['white',[6,0]]
-wp2 = ['white',[6,1]]
-wp3 = ['white',[6,2]]
-wp4 = ['white',[6,3]]
-wp5 = ['white',[6,4]]
-wp6 = ['white',[6,5]]
-wp7 = ['white',[6,6]]
-wp8 = ['white',[6,7]]
-wkn1 = ['black',[0,1]]
-wkn2 = ['black',[0,6]]
-wb1 = ['black',[0,2]]
-wb2 = ['black',[0,5]]
-wr1 = ['black',[0,0]]
-wr2 = ['black',[0,7]]
-wq = ['black',[0,3]]
-wk = ['black',[0,4]]
 
 def Board():
     global board
     board = []
     for i in range(8):
-        [' ',' ',' ',' ',' ',' ',' ',' ',' ']
+        board.append([' ',' ',' ',' ',' ',' ',' ',' '])
     for i in range(8):
-        board[1][i] = white_pawn
-        board[7][i] = black_pawn
+        board[1][i] = black_pawns[i]
+        board[6][i] = white_pawns[i]
     
+    board[0] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
+    board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
     
-    board[0] = [white_rook,white_knight,white_bishop,white_king,white_queen,white_bishop,white_knight,white_rook]
-    board[6] = [black_rook,black_knight,black_bishop,black_king,black_king,black_bishop,black_knight,black_rook]
     for i in range(8):
-        print('\n')
-        for j in range(8):
-            print(board[i][j].piece,end=' ')
+        print(board[i])
 Board()
 def move(initial_x,initial_y,final_x,final_y):
     board[final_x][final_y]=board[initial_x][initial_y]
@@ -154,12 +122,21 @@ def queen_move(initial_x,initial_y,final_x,final_y):
     if (initial_x==final_x) or (initial_y==final_y):
         pass
 
+def ClickedSquare(coordinates):
+    x = coordinates[0]
+    y = coordinates[1]
+    x = x//80 - 1
+    y = y//80 - 1
+    return board[y][x]
+
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.MOUSEBUTTONUP:
-            mouse_position = pygame.mouse.get_pos()
-            print(mouse_position)
+        for i in range(2):
+            if event.type == pygame.MOUSEBUTTONUP:
+                mouse_position = pygame.mouse.get_pos()
+                print(ClickedSquare(mouse_position))
+
     pygame.display.update()
