@@ -3,10 +3,12 @@ import pygame
 import math
 
 pygame.init()
-GameDisplay = pygame.display.set_mode((800,800))
+HEIGHT=800
+WIDTH=800
+GameDisplay = pygame.display.set_mode((HEIGHT,WIDTH))
 
 WHITE = (255,255,255)
-BLACK = (0,0,0)
+BLACK = (165,42,42)
 square_size = 80
 GameDisplay.fill(WHITE)
 
@@ -21,6 +23,57 @@ for i in range(1,9):
     k-=1
 
 pygame.display.set_caption('CHESS')
+black_rook_img=pygame.image.load('pieces/black_rook.png')
+black_rook_img=pygame.transform.scale(black_rook_img,(80,80))
+GameDisplay.blit(black_rook_img,(HEIGHT/10,WIDTH/10))
+GameDisplay.blit(black_rook_img,(8*HEIGHT/10,WIDTH/10))
+black_knight_img=pygame.image.load('pieces/black_knight.png')
+black_knight_img=pygame.transform.scale(black_knight_img,(80,80))
+GameDisplay.blit(black_knight_img,(2*HEIGHT/10,WIDTH/10))
+GameDisplay.blit(black_knight_img,(7*HEIGHT/10,WIDTH/10))
+black_bishop_img=pygame.image.load('pieces/black_bishop.png')
+black_bishop_img=pygame.transform.scale(black_bishop_img,(80,80))
+GameDisplay.blit(black_bishop_img,(3*HEIGHT/10,WIDTH/10))
+GameDisplay.blit(black_bishop_img,(6*HEIGHT/10,WIDTH/10))
+black_king_img=pygame.image.load('pieces/black_king.png')
+black_king_img=pygame.transform.scale(black_king_img,(80,80))
+GameDisplay.blit(black_king_img,(4*HEIGHT/10,WIDTH/10))
+black_queen_img=pygame.image.load('pieces/black_queen.png')
+black_queen_img=pygame.transform.scale(black_queen_img,(80,80))
+GameDisplay.blit(black_queen_img,(5*HEIGHT/10,WIDTH/10))
+i=1
+while i<=8:
+    black_pawn_img=pygame.image.load('pieces/black_pawn.png')
+    black_pawn_img=pygame.transform.scale(black_pawn_img,(80,80))
+    GameDisplay.blit(black_pawn_img,(i*HEIGHT/10,2*WIDTH/10))
+    i=i+1
+white_rook_img=pygame.image.load('pieces/white_rook.png')
+white_rook_img=pygame.transform.scale(white_rook_img,(80,80))
+GameDisplay.blit(white_rook_img,(HEIGHT/10,8*WIDTH/10))
+GameDisplay.blit(white_rook_img,(8*HEIGHT/10,8*WIDTH/10))
+white_knight_img=pygame.image.load('pieces/white_knight.png')
+white_knight_img=pygame.transform.scale(white_knight_img,(80,80))
+GameDisplay.blit(white_knight_img,(2*HEIGHT/10,8*WIDTH/10))
+GameDisplay.blit(white_knight_img,(7*HEIGHT/10,8*WIDTH/10))
+white_bishop_img=pygame.image.load('pieces/white_bishop.png')
+white_bishop_img=pygame.transform.scale(white_bishop_img,(80,80))
+GameDisplay.blit(white_bishop_img,(3*HEIGHT/10,8*WIDTH/10))
+GameDisplay.blit(white_bishop_img,(6*HEIGHT/10,8*WIDTH/10))
+white_king_img=pygame.image.load('pieces/white_king.png')
+white_king_img=pygame.transform.scale(white_king_img,(80,80))
+GameDisplay.blit(white_king_img,(4*HEIGHT/10,8*WIDTH/10))
+white_queen_img=pygame.image.load('pieces/white_queen.png')
+white_queen_img=pygame.transform.scale(white_queen_img,(80,80))
+GameDisplay.blit(white_queen_img,(5*HEIGHT/10,8*WIDTH/10))
+i=1
+while i<=8:
+    white_pawn_img=pygame.image.load('pieces/white_pawn.png')
+    white_pawn_img=pygame.transform.scale(white_pawn_img,(80,80))
+    GameDisplay.blit(white_pawn_img,(i*HEIGHT/10,7*WIDTH/10))
+    i=i+1
+
+
+
 Clock = pygame.time.Clock()
 
 #black_pawn      #white_pawn 
