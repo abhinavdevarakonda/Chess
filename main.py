@@ -2,9 +2,10 @@ import time
 import pygame
 import math
 
+HEIGHT = 800
+WIDTH = 800
 pygame.init()
-HEIGHT=800
-WIDTH=800
+
 GameDisplay = pygame.display.set_mode((HEIGHT,WIDTH))
 
 WHITE = (255,255,255)
@@ -82,33 +83,46 @@ Clock = pygame.time.Clock()
 #black_rook      #white_rook 
 #black_queen     #white_queen 
 #black_king      #white_king 
-class PIECE:
-    def __init__(self,piece,colour,picture):
-        self.piece = piece
-        self.colour = colour
-        self.picture = picture
 
-black_pawn = PIECE('pawn','black','black_pawn.png')
-white_pawn = PIECE('pawn','white','white_pawn.png')
-black_knight = PIECE('knight','black','black_knight.png')
-white_knight = PIECE('knight','white','white_knight.png')
-black_bishop = PIECE('bishop','black','black_bishop')
-white_bishop = PIECE('bishop','white','white_bishop.png')
-black_rook = PIECE('rook','black','black_rook.png')
-white_rook = PIECE('rook','white','white_rook.png')
-black_queen = PIECE('queen','black','black_queen.png')
-white_queen = PIECE('queen','white','white_queen.png')
-black_king = PIECE('king','black','black_king.png')
-white_king = PIECE('king','white','white_king.png')
-empty_square = PIECE('.',' ',' ')
+bp1 = ['black',[1,0]]
+bp2 = ['black',[1,1]]
+bp3 = ['black',[1,2]]
+bp4 = ['black',[1,3]]
+bp5 = ['black',[1,4]]
+bp6 = ['black',[1,5]]
+bp7 = ['black',[1,6]]
+bp8 = ['black',[1,7]]
+bkn1 = ['black',[0,1]]
+bkn2 = ['black',[0,6]]
+bb1 = ['black',[0,2]]
+bb2 = ['black',[0,5]]
+br1 = ['black',[0,0]]
+br2 = ['black',[0,7]]
+bq = ['black',[0,3]]
+bk = ['black',[0,4]]
+
+wp1 = ['white',[6,0]]
+wp2 = ['white',[6,1]]
+wp3 = ['white',[6,2]]
+wp4 = ['white',[6,3]]
+wp5 = ['white',[6,4]]
+wp6 = ['white',[6,5]]
+wp7 = ['white',[6,6]]
+wp8 = ['white',[6,7]]
+wkn1 = ['black',[0,1]]
+wkn2 = ['black',[0,6]]
+wb1 = ['black',[0,2]]
+wb2 = ['black',[0,5]]
+wr1 = ['black',[0,0]]
+wr2 = ['black',[0,7]]
+wq = ['black',[0,3]]
+wk = ['black',[0,4]]
+
 def Board():
     global board
     board = []
     for i in range(8):
-        board.append([])
-        for j in range(8):
-            board[i].append(empty_square)
-    
+        [' ',' ',' ',' ',' ',' ',' ',' ',' ']
     for i in range(8):
         board[1][i] = white_pawn
         board[7][i] = black_pawn
@@ -140,10 +154,12 @@ def queen_move(initial_x,initial_y,final_x,final_y):
     if (initial_x==final_x) or (initial_y==final_y):
         pass
 
-
-end = False
-while not end:
+running = True
+while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            end = True
+            running = False
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse_position = pygame.mouse.get_pos()
+            print(mouse_position)
     pygame.display.update()
