@@ -134,9 +134,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        for i in range(2):
-            if event.type == pygame.MOUSEBUTTONUP:
-                mouse_position = pygame.mouse.get_pos()
-                print(ClickedSquare(mouse_position))
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse_position = pygame.mouse.get_pos()
+            print(ClickedSquare(mouse_position))
 
     pygame.display.update()
