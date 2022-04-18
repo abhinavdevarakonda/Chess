@@ -155,6 +155,7 @@ while running:
                     board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]] = MovingPiece
                     Board()
                     step = 0
+                    
 
             except IndexError:
                 pass
@@ -162,3 +163,4 @@ while running:
 
 
     pygame.display.update()
+
