@@ -38,10 +38,10 @@ GameDisplay.blit(black_bishop_img,(3*HEIGHT/10,WIDTH/10))
 GameDisplay.blit(black_bishop_img,(6*HEIGHT/10,WIDTH/10))
 black_king_img=pygame.image.load('pieces/black_king.png')
 black_king_img=pygame.transform.scale(black_king_img,(80,80))
-GameDisplay.blit(black_king_img,(4*HEIGHT/10,WIDTH/10))
+GameDisplay.blit(black_king_img,(5*HEIGHT/10,WIDTH/10))
 black_queen_img=pygame.image.load('pieces/black_queen.png')
 black_queen_img=pygame.transform.scale(black_queen_img,(80,80))
-GameDisplay.blit(black_queen_img,(5*HEIGHT/10,WIDTH/10))
+GameDisplay.blit(black_queen_img,(4*HEIGHT/10,WIDTH/10))
 i=1
 while i<=8:
     black_pawn_img=pygame.image.load('pieces/black_pawn.png')
@@ -62,10 +62,10 @@ GameDisplay.blit(white_bishop_img,(3*HEIGHT/10,8*WIDTH/10))
 GameDisplay.blit(white_bishop_img,(6*HEIGHT/10,8*WIDTH/10))
 white_king_img=pygame.image.load('pieces/white_king.png')
 white_king_img=pygame.transform.scale(white_king_img,(80,80))
-GameDisplay.blit(white_king_img,(4*HEIGHT/10,8*WIDTH/10))
+GameDisplay.blit(white_king_img,(5*HEIGHT/10,8*WIDTH/10))
 white_queen_img=pygame.image.load('pieces/white_queen.png')
 white_queen_img=pygame.transform.scale(white_queen_img,(80,80))
-GameDisplay.blit(white_queen_img,(5*HEIGHT/10,8*WIDTH/10))
+GameDisplay.blit(white_queen_img,(4*HEIGHT/10,8*WIDTH/10))
 i=1
 while i<=8:
     white_pawn_img=pygame.image.load('pieces/white_pawn.png')
@@ -87,22 +87,21 @@ Clock = pygame.time.Clock()
 black_pawns = ['bp1','bp2','bp3','bp4','bp5','bp6','bp7','bp8']
 white_pawns = ['wp1','wp2','wp3','wp4','wp5','wp6','wp7','wp8']
 
+board = []
+for i in range(8):
+    board.append([' ',' ',' ',' ',' ',' ',' ',' '])
+for i in range(8):
+    board[1][i] = black_pawns[i]
+    board[6][i] = white_pawns[i]
+
+board[0] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
+board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
 
 def Board():
-    global board
-    board = []
-    for i in range(8):
-        board.append([' ',' ',' ',' ',' ',' ',' ',' '])
-    for i in range(8):
-        board[1][i] = black_pawns[i]
-        board[6][i] = white_pawns[i]
-    
-    board[0] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
-    board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
-    
     for i in range(8):
         print(board[i])
 Board()
+
 def move(initial_x,initial_y,final_x,final_y):
     board[final_x][final_y]=board[initial_x][initial_y]
     board[initial_x][initial_y]=' '
@@ -127,15 +126,31 @@ def ClickedSquare(coordinates):
     y = coordinates[1]
     x = x//80 - 1
     y = y//80 - 1
-    return board[y][x]
+    return [y,x]
 
 running = True
+step = 0
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_position = pygame.mouse.get_pos()
-            print(ClickedSquare(mouse_position))
+            a = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+            
+            if a != ' ' and step==0:
+                intial_coordinates = ClickedSquare(mouse_position)
+                MovingPiece = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+                step = 1
 
+            if a == ' ' and step == 1:
+                print('check')
+                board[intial_coordinates[0]][intial_coordinates[1]] = ' '
+                board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]] = MovingPiece
+                Board()
+                step = 0
+
+
+                
     pygame.display.update()
