@@ -87,22 +87,21 @@ Clock = pygame.time.Clock()
 black_pawns = ['bp1','bp2','bp3','bp4','bp5','bp6','bp7','bp8']
 white_pawns = ['wp1','wp2','wp3','wp4','wp5','wp6','wp7','wp8']
 
+board = []
+for i in range(8):
+    board.append([' ',' ',' ',' ',' ',' ',' ',' '])
+for i in range(8):
+    board[1][i] = black_pawns[i]
+    board[6][i] = white_pawns[i]
+
+board[0] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
+board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
 
 def Board():
-    global board
-    board = []
-    for i in range(8):
-        board.append([' ',' ',' ',' ',' ',' ',' ',' '])
-    for i in range(8):
-        board[1][i] = black_pawns[i]
-        board[6][i] = white_pawns[i]
-    
-    board[0] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
-    board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
-    
     for i in range(8):
         print(board[i])
 Board()
+
 def move(initial_x,initial_y,final_x,final_y):
     board[final_x][final_y]=board[initial_x][initial_y]
     board[initial_x][initial_y]=' '
@@ -127,15 +126,39 @@ def ClickedSquare(coordinates):
     y = coordinates[1]
     x = x//80 - 1
     y = y//80 - 1
-    return board[y][x]
+    return [y,x]
 
 running = True
+step = 0
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_position = pygame.mouse.get_pos()
-            print(ClickedSquare(mouse_position))
+
+            try:
+                item = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+                print(ClickedSquare(mouse_position))
+
+                if ClickedSquare(mouse_position)[0] < 0 or ClickedSquare(mouse_position)[1] < 0:
+                    pass
+                
+                elif item != ' ' and step==0:
+                    intial_coordinates = ClickedSquare(mouse_position)
+                    MovingPiece = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+                    step = 1
+
+                elif item == ' ' and step == 1:
+                    board[intial_coordinates[0]][intial_coordinates[1]] = ' '
+                    board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]] = MovingPiece
+                    Board()
+                    step = 0
+
+            except IndexError:
+                pass
+
+
 
     pygame.display.update()
