@@ -137,28 +137,29 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_position = pygame.mouse.get_pos()
+            if board[ClickedSquare(mouse_position)[0][ClickedSquare(mouse_position)[1]]][0]=='w'or' ':
 
-            try:
-                item = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
-                print(ClickedSquare(mouse_position))
+                try:
+                    item = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
 
-                if ClickedSquare(mouse_position)[0] < 0 or ClickedSquare(mouse_position)[1] < 0:
-                    pass
-                
-                elif item != ' ' and step==0:
-                    intial_coordinates = ClickedSquare(mouse_position)
-                    MovingPiece = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
-                    step = 1
-
-                elif item == ' ' and step == 1:
-                    board[intial_coordinates[0]][intial_coordinates[1]] = ' '
-                    board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]] = MovingPiece
-                    Board()
-                    step = 0
+                    if ClickedSquare(mouse_position)[0] < 0 or ClickedSquare(mouse_position)[1] < 0:
+                        pass
+                    elif item != ' ' and step==0:
+                        intial_coordinates = ClickedSquare(mouse_position)
+                        MovingPiece = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+                        step = 1
+                    elif item !=' ' and step==1:
+                        intial_coordinates = ClickedSquare(mouse_position)
+                        MovingPiece = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+                    elif item == ' ' and step == 1:
+                        board[intial_coordinates[0]][intial_coordinates[1]] = ' '
+                        board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]] = MovingPiece
+                        Board()
+                        step = 0
                     
 
-            except IndexError:
-                pass
+                except IndexError:
+                    pass
 
 
 
