@@ -8,6 +8,7 @@ pygame.init()
 
 GameDisplay = pygame.display.set_mode((HEIGHT,WIDTH))
 
+#############INITIAL BOARD DRAWING######################
 WHITE = (255,255,255)
 BLACK = (165,42,42)
 square_size = 80
@@ -98,9 +99,50 @@ board[0] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
 board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
 
 def Board():
+    GameDisplay.fill(WHITE)
+    k=0
+    for i in range(1,9):
+        for j in range(1,9):
+            if k%2 == 0:
+                pygame.draw.rect(GameDisplay,WHITE,(j*square_size,i*square_size,square_size,square_size))
+            else:
+                pygame.draw.rect(GameDisplay,BLACK,(j*square_size,i*square_size,square_size,square_size))
+            k+=1
+        k-=1
+
     for i in range(8):
-        print(board[i])
-Board()
+        for j in range(8):
+            if board[i][j][:2] == 'br':
+                GameDisplay.blit(black_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            elif board[i][j][:2] == 'wr':
+                GameDisplay.blit(white_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+
+            elif board[i][j][:3] == 'bkn':
+                GameDisplay.blit(black_knight_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            elif board[i][j][:3] == 'wkn':
+                GameDisplay.blit(white_knight_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            
+            elif board[i][j][:2] == 'bb':
+                GameDisplay.blit(black_bishop_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            elif board[i][j][:2] == 'wb':
+                GameDisplay.blit(white_bishop_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            
+            elif board[i][j][:2] == 'bq':
+                GameDisplay.blit(black_queen_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            elif board[i][j][:2] == 'wq':
+                GameDisplay.blit(white_queen_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            
+            elif board[i][j][:2] == 'bk':
+                GameDisplay.blit(black_king_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            elif board[i][j][:2] == 'wk':
+                GameDisplay.blit(white_king_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            
+            elif board[i][j][:2] == 'bp':
+                GameDisplay.blit(black_pawn_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+            elif board[i][j][:2] == 'wp':
+                GameDisplay.blit(white_pawn_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+
+
 
 def move():
     def movement(initial_x,initial_y,final_x,final_y):
