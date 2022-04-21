@@ -144,30 +144,37 @@ def Board():
 
 
 
-def move():
-    def movement(initial_x,initial_y,final_x,final_y):
-        board[final_x][final_y]=board[initial_x][initial_y]
+def move(piece,initial_x,initial_y,final_x,final_y):
+    colour = ''
+    if piece[0] == 'w':
+        colour = 'white'
+    else:
+        colour = 'black'
+    
+    def movement(initial_x,initial_y,final_x,final_y,colour,piece):
+        board[final_x][final_y]=piece
         board[initial_x][initial_y]=' '
 
-    def pawn_first_move(initial_x,initial_y,final_x,final_y):
+    def pawn_first_move(initial_x,initial_y,final_x,final_y,colour):
         if initial_x==final_x and (final_y-initial_y==1 or final_y-initial_y==2):
             movement(initial_x,initial_y,final_x,final_y)
 
-    def knight_move(initial_x,initial_y,final_x,final_y):
+    def knight_move(initial_x,initial_y,final_x,final_y,colour):
         if (math.fabs(final_x-initial_x==1) and math.fabs(final_y-initial_y==2))or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y==1)):
             movement(initial_x,initial_y,final_x,final_y)
 
-    def bishop_move(initial_x,initial_y,final_x,final_y):
+    def bishop_move(initial_x,initial_y,final_x,final_y,colour):
         if (math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y)):
             movement(initial_x,initial_y,final_x,final_y)
 
-    def rook_move(initial_x,initial_y,final_x,final_y):
+    def rook_move(initial_x,initial_y,final_x,final_y,colour):
         if (initial_x==final_x) or (initial_y==final_y):
             movement(initial_x,initial_y,final_x,final_y)
 
-    def queen_move(initial_x,initial_y,final_x,final_y):
+    def queen_move(initial_x,initial_y,final_x,final_y,colour):
         if (initial_x==final_x) or (initial_y==final_y):
             movement(initial_x,initial_y,final_x,final_y)
+
 
 def ClickedSquare(coordinates):
     x = coordinates[0]
@@ -199,6 +206,7 @@ while running:
                     elif item !=' ' and step==1:
                         intial_coordinates = ClickedSquare(mouse_position)
                         MovingPiece = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+
                     elif item == ' ' and step == 1:
                         board[intial_coordinates[0]][intial_coordinates[1]] = ' '
                         board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]] = MovingPiece
