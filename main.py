@@ -111,6 +111,7 @@ def Board():
         k-=1
 
     for i in range(8):
+        print(board[i])
         for j in range(8):
             if board[i][j][:2] == 'br':
                 GameDisplay.blit(black_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
@@ -192,8 +193,7 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_position = pygame.mouse.get_pos()
-            if board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]][0]=='w'or' ':
-
+            if board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]][0]== 'w' or ' ':
                 try:
                     item = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
 
