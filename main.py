@@ -162,7 +162,7 @@ def move(initial_coords,final_coords):
             movement(initial_x,initial_y,final_x,final_y)
 
     def knight_move(initial_x,initial_y,final_x,final_y):
-        if (math.fabs(final_x-initial_x==1) and math.fabs(final_y-initial_y==2))or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y==1)):
+        if (math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==2)or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y)==1):
             movement(initial_x,initial_y,final_x,final_y)
 
     def bishop_move(initial_x,initial_y,final_x,final_y):
@@ -184,7 +184,7 @@ def move(initial_coords,final_coords):
     elif board[initial_x][initial_y][1] == 'r':
         rook_move(initial_x,initial_y,final_x,final_y)
 
-    elif board[initial_x][initial_y][1:3] == 'kn':
+    elif board[initial_x][initial_y][1]== 'k'and len(board[initial_x][initial_y])==4:
         knight_move(initial_x,initial_y,final_x,final_y)
 
     elif board[initial_x][initial_y][1] == 'b':
