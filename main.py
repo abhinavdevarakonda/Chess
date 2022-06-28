@@ -193,7 +193,8 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_position = pygame.mouse.get_pos()
-            if board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]][0]== 'w' or ' ':
+            if (board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]][0])=='w'or(board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]][0])==' ':
+                print(mouse_position,ClickedSquare(mouse_position))
                 try:
                     item = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
 
