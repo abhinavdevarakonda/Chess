@@ -111,7 +111,6 @@ def Board():
         k-=1
 
     for i in range(8):
-        print(board[i])
         for j in range(8):
             if board[i][j][:2] == 'br':
                 GameDisplay.blit(black_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
@@ -158,7 +157,7 @@ def move(initial_coords,final_coords):
 
     def pawn_first_move(initial_x,initial_y,final_x,final_y):
         print(math.fabs(final_x-initial_x))
-        if initial_y==final_y and (math.fabs(final_x-initial_x==1) or math.fabs(final_x-initial_x==2)):
+        if initial_y==final_y and (math.fabs(final_x-initial_x)==1 or math.fabs(final_x-initial_x)==2):
             print('here')
             movement(initial_x,initial_y,final_x,final_y)
 
@@ -243,4 +242,3 @@ while running:
 
 
     pygame.display.update()
-
