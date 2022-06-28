@@ -111,6 +111,7 @@ def Board():
         k-=1
 
     for i in range(8):
+        print(board[i])
         for j in range(8):
             if board[i][j][:2] == 'br':
                 GameDisplay.blit(black_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
