@@ -111,7 +111,6 @@ def Board():
         k-=1
 
     for i in range(8):
-        print(board[i])
         for j in range(8):
             if board[i][j][:2] == 'br':
                 GameDisplay.blit(black_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
@@ -145,37 +144,57 @@ def Board():
 
 
 
-def move(piece,initial_x,initial_y,final_x,final_y):
-    colour = ''
-    if piece[0] == 'w':
-        colour = 'white'
-    else:
-        colour = 'black'
-    
-    def movement(initial_x,initial_y,final_x,final_y,colour,piece):
-        board[final_x][final_y]=piece
-        board[initial_x][initial_y]=' '
+def move(initial_coords,final_coords):
+    initial_x = initial_coords[0]
+    initial_y = initial_coords[1]
+    final_x = final_coords[0]
+    final_y = final_coords[1]
 
-    def pawn_first_move(initial_x,initial_y,final_x,final_y,colour):
-        if initial_x==final_x and (final_y-initial_y==1 or final_y-initial_y==2):
+    def movement(initial_x,initial_y,final_x,final_y):
+        board[final_x][final_y] = MovingPiece
+        board[initial_x][initial_y] = ' '
+        Board()
+
+    def pawn_first_move(initial_x,initial_y,final_x,final_y):
+        print(math.fabs(final_x-initial_x))
+        if initial_y==final_y and (math.fabs(final_x-initial_x==1) or math.fabs(final_x-initial_x==2)):
+            print('here')
             movement(initial_x,initial_y,final_x,final_y)
 
-    def knight_move(initial_x,initial_y,final_x,final_y,colour):
+    def knight_move(initial_x,initial_y,final_x,final_y):
         if (math.fabs(final_x-initial_x==1) and math.fabs(final_y-initial_y==2))or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y==1)):
             movement(initial_x,initial_y,final_x,final_y)
 
-    def bishop_move(initial_x,initial_y,final_x,final_y,colour):
+    def bishop_move(initial_x,initial_y,final_x,final_y):
         if (math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y)):
             movement(initial_x,initial_y,final_x,final_y)
 
-    def rook_move(initial_x,initial_y,final_x,final_y,colour):
+    def rook_move(initial_x,initial_y,final_x,final_y):
         if (initial_x==final_x) or (initial_y==final_y):
             movement(initial_x,initial_y,final_x,final_y)
 
-    def queen_move(initial_x,initial_y,final_x,final_y,colour):
-        if (initial_x==final_x) or (initial_y==final_y):
+    def queen_move(initial_x,initial_y,final_x,final_y):
+        if ((initial_x==final_x) or (initial_y==final_y)) or ((math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y))):
             movement(initial_x,initial_y,final_x,final_y)
+    
+    #if pawn first move
+    if board[initial_x][initial_y][1] == 'p':
+        pawn_first_move(initial_x,initial_y,final_x,final_y)
+    
+    elif board[initial_x][initial_y][1] == 'r':
+        rook_move(initial_x,initial_y,final_x,final_y)
 
+    elif board[initial_x][initial_y][1:3] == 'kn':
+        knight_move(initial_x,initial_y,final_x,final_y)
+
+    elif board[initial_x][initial_y][1] == 'b':
+        bishop_move(initial_x,initial_y,final_x,final_y)
+
+    elif board[initial_x][initial_y][1:] == 'q':
+        queen_move(initial_x,initial_y,final_x,final_y)
+
+    
+        
 
 def ClickedSquare(coordinates):
     x = coordinates[0]
@@ -193,25 +212,28 @@ while running:
         
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_position = pygame.mouse.get_pos()
-            if (board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]][0])=='w'or(board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]][0])==' ':
-                print(mouse_position,ClickedSquare(mouse_position))
+            clicked_coords = ClickedSquare(mouse_position)
+            if board[clicked_coords[0]][clicked_coords[1]][0]=='w'or board[clicked_coords[0]][clicked_coords[1]][0]==' ':
                 try:
-                    item = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+                    item = board[clicked_coords[0]][clicked_coords[1]]
 
-                    if ClickedSquare(mouse_position)[0] < 0 or ClickedSquare(mouse_position)[1] < 0:
+                    if clicked_coords[0] < 0 or clicked_coords[1] < 0:
                         pass
                     elif item != ' ' and step==0:
-                        intial_coordinates = ClickedSquare(mouse_position)
-                        MovingPiece = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+                        intial_coordinates = clicked_coords
+                        MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
                         step = 1
                     elif item !=' ' and step==1:
-                        intial_coordinates = ClickedSquare(mouse_position)
-                        MovingPiece = board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]]
+                        intial_coordinates = clicked_coords
+                        MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
 
                     elif item == ' ' and step == 1:
+                        move(intial_coordinates,clicked_coords)
+                        '''
                         board[intial_coordinates[0]][intial_coordinates[1]] = ' '
-                        board[ClickedSquare(mouse_position)[0]][ClickedSquare(mouse_position)[1]] = MovingPiece
+                        board[clicked_coords[0]][clicked_coords[1]] = MovingPiece
                         Board()
+                        '''
                         step = 0
                     
                 except IndexError:
