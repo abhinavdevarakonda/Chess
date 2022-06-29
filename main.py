@@ -155,10 +155,20 @@ def move(initial_coords,final_coords):
         board[initial_x][initial_y] = ' '
         Board()
 
-    def pawn_first_move(initial_x,initial_y,final_x,final_y):
-        print(math.fabs(final_x-initial_x))
-        if initial_y==final_y and (math.fabs(final_x-initial_x)==1 or math.fabs(final_x-initial_x)==2):
-            print('here')
+    def white_pawn_first_move(initial_x,initial_y,final_x,final_y):
+        if initial_y==final_y and ((final_x-initial_x)==-1 or (final_x-initial_x)==-2):
+            movement(initial_x,initial_y,final_x,final_y)
+    
+    def white_pawn_move(initial_x,initial_y,final_x,final_y):
+        if (initial_y==final_y) and (final_x-initial_x==-1):
+            movement(initial_x,initial_y,final_x,final_y)
+    
+    def black_pawn_first_move(initial_x,initial_y,final_x,final_y):
+        if initial_y==final_y and ((final_x-initial_x)==1 or (final_x-initial_x)==2):
+            movement(initial_x,initial_y,final_x,final_y)
+    
+    def black_pawn_move(initial_x,initial_y,final_x,final_y):
+        if (initial_y==final_y) and (final_x-initial_x==1):
             movement(initial_x,initial_y,final_x,final_y)
 
     def knight_move(initial_x,initial_y,final_x,final_y):
@@ -176,10 +186,22 @@ def move(initial_coords,final_coords):
     def queen_move(initial_x,initial_y,final_x,final_y):
         if ((initial_x==final_x) or (initial_y==final_y)) or ((math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y))):
             movement(initial_x,initial_y,final_x,final_y)
+    def king_move(initial_x,initial_y,final_x,final_y):
+        if((math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==0 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==0)):
+            movement(initial_x,initial_y,final_x,final_y)
     
     #if pawn first move
-    if board[initial_x][initial_y][1] == 'p':
-        pawn_first_move(initial_x,initial_y,final_x,final_y)
+    if board[initial_x][initial_y][0] == 'w' and board[initial_x][initial_y][1] == 'p' and initial_x==6:
+        white_pawn_first_move(initial_x,initial_y,final_x,final_y)
+    
+    elif board[initial_x][initial_y][0] == 'b' and board[initial_x][initial_y][1] == 'p'and initial_x==1:
+        black_pawn_first_move(initial_x,initial_y,final_x,final_y)\
+    
+    elif board[initial_x][initial_y][0] == 'w' and board[initial_x][initial_y][1] == 'p'and initial_x!=6:
+        white_pawn_move(initial_x,initial_y,final_x,final_y)
+    
+    elif board[initial_x][initial_y][0] == 'b' and board[initial_x][initial_y][1] == 'p'and initial_x!=1:
+        black_pawn_move(initial_x,initial_y,final_x,final_y)
     
     elif board[initial_x][initial_y][1] == 'r':
         rook_move(initial_x,initial_y,final_x,final_y)
@@ -192,6 +214,9 @@ def move(initial_coords,final_coords):
 
     elif board[initial_x][initial_y][1:] == 'q':
         queen_move(initial_x,initial_y,final_x,final_y)
+    
+    elif board[initial_x][initial_y][1] == 'k'and len(board[initial_x][initial_y])==2:
+        king_move(initial_x,initial_y,final_x,final_y)
 
     
         
