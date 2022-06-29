@@ -205,6 +205,7 @@ def ClickedSquare(coordinates):
 
 running = True
 step = 0
+turns = 0
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -213,31 +214,41 @@ while running:
         if event.type == pygame.MOUSEBUTTONUP:
             mouse_position = pygame.mouse.get_pos()
             clicked_coords = ClickedSquare(mouse_position)
-            if board[clicked_coords[0]][clicked_coords[1]][0]=='w'or board[clicked_coords[0]][clicked_coords[1]][0]==' ':
-                try:
-                    item = board[clicked_coords[0]][clicked_coords[1]]
 
-                    if clicked_coords[0] < 0 or clicked_coords[1] < 0:
-                        pass
-                    elif item != ' ' and step==0:
-                        intial_coordinates = clicked_coords
+            try:
+                item = board[clicked_coords[0]][clicked_coords[1]]
+
+                if clicked_coords[0] < 0 or clicked_coords[1] < 0:
+                    pass
+                elif item != ' ' and step==0:
+                    print(turns,'...turns')
+                    if (turns%2==0 and board[clicked_coords[0]][clicked_coords[1]][0] == 'w') or (turns%2==1 and board[clicked_coords[0]][clicked_coords[1]][0] == 'b'):
+                        initial_coordinates = clicked_coords
                         MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
                         step = 1
-                    elif item !=' ' and step==1:
-                        intial_coordinates = clicked_coords
-                        MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
-
-                    elif item == ' ' and step == 1:
-                        move(intial_coordinates,clicked_coords)
-                        '''
-                        board[intial_coordinates[0]][intial_coordinates[1]] = ' '
-                        board[clicked_coords[0]][clicked_coords[1]] = MovingPiece
-                        Board()
-                        '''
+                elif item !=' ' and step==1:
+                    #if the piece they clicked on is of same colour as their initial click
+                    MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
+                    if MovingPiece[0] == board[initial_coordinates[0]][initial_coordinates[1]][0]:
+                        initial_coordinates = clicked_coords
+                    else:
+                        #this is if they try to capture a piece (click on their piece and then the enemy piece)
+                        print(board[initial_coordinates[0]][initial_coordinates[1]],'...initial')
+                        print(board[clicked_coords[0]][clicked_coords[1]],'...final')
+                        move(initial_coordinates,clicked_coords)
                         step = 0
-                    
-                except IndexError:
-                    pass
+                        turns += 1
+
+                elif item == ' ' and step == 1:
+                    move(initial_coordinates,clicked_coords)
+                    step = 0
+                    turns += 1
+                
+            except IndexError:
+                pass
+                
+            #for i in board:
+            #    print(i)
 
 
 
