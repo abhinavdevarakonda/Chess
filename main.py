@@ -431,6 +431,7 @@ while running:
                         print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
             
                         move(initial_coordinates,clicked_coords)
+                        
             
                         step = 0
                         turns += 1
