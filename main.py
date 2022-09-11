@@ -13,18 +13,7 @@ WHITE = (255,255,255)
 BLACK = (165,42,42)
 square_size = 80
 GameDisplay.fill(WHITE)
-'''
-k=0
-for i in range(1,9):
-    for j in range(1,9):
-        j += 2 #just to shift the whole board a little to the right
-        if k%2 == 0:
-            pygame.draw.rect(GameDisplay,WHITE,((j)*square_size,i*square_size,square_size,square_size))
-        else:
-            pygame.draw.rect(GameDisplay,BLACK,((j)*square_size,i*square_size,square_size,square_size))
-        k+=1
-    k-=1
-'''
+
 pygame.display.set_caption('CHESS')
 
 black_rook_img=pygame.image.load('pieces/black_rook.png')
@@ -317,7 +306,6 @@ def move(initial_coords,final_coords):
                         if i != ' ':
                             valid = False
         print(path,'...path')
-        print(valid,'..valid')
         return valid
             
     def movement(initial_x,initial_y,final_x,final_y):
@@ -372,16 +360,16 @@ def move(initial_coords,final_coords):
                 movement(initial_x,initial_y,final_x,final_y)
 
     #if pawn first move
-    if board[initial_x][initial_y][0] == 'w' and board[initial_x][initial_y][1] == 'p' and initial_x==6:
+    if board[initial_x][initial_y][0] == 'w' and board[initial_x][initial_y][1] == 'p' and turns==0:
         white_pawn_first_move(initial_x,initial_y,final_x,final_y)
     
-    elif board[initial_x][initial_y][0] == 'b' and board[initial_x][initial_y][1] == 'p'and initial_x==1:
+    elif board[initial_x][initial_y][0] == 'b' and board[initial_x][initial_y][1] == 'p'and turns==1:
         black_pawn_first_move(initial_x,initial_y,final_x,final_y)\
     
-    elif board[initial_x][initial_y][0] == 'w' and board[initial_x][initial_y][1] == 'p'and initial_x!=6:
+    elif board[initial_x][initial_y][0] == 'w' and board[initial_x][initial_y][1] == 'p':
         white_pawn_move(initial_x,initial_y,final_x,final_y)
     
-    elif board[initial_x][initial_y][0] == 'b' and board[initial_x][initial_y][1] == 'p'and initial_x!=1:
+    elif board[initial_x][initial_y][0] == 'b' and board[initial_x][initial_y][1] == 'p':
         black_pawn_move(initial_x,initial_y,final_x,final_y)
     
     elif board[initial_x][initial_y][1] == 'r':
@@ -440,16 +428,17 @@ while running:
                         initial_coordinates = clicked_coords
                     else:
                         #this is if they try to capture a piece (click on their piece and then the enemy piece)
-                        print(board[initial_coordinates[0]][initial_coordinates[1]],'...initial')
-                        print(board[clicked_coords[0]][clicked_coords[1]],'...final')
-                        #move(initial_coordinates,clicked_coords)
+                        print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
+            
+                        move(initial_coordinates,clicked_coords)
+            
                         step = 0
                         turns += 1
 
                 elif item == ' ' and step == 1:
                     move(initial_coordinates,clicked_coords) 
                     step = 0
-                    print(turns)
+                    print(turns,'..turns')
                     #turns += 1
                 
             except IndexError:
