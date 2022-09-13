@@ -458,9 +458,9 @@ def Check(board,MovingPiece):
                     return True
         
         if side(black_kingx,black_kingy,'wkn'):
-            return 'white'
-        elif side(white_kingx,white_kingy,'bkn'):
             return 'black'
+        elif side(white_kingx,white_kingy,'bkn'):
+            return 'white'
     
     
     def bishop_check():
