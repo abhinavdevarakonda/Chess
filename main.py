@@ -11,9 +11,11 @@ GameDisplay = pygame.display.set_mode((800,800))
 #############INITIAL BOARD DRAWING######################
 WHITE = (255,255,255)
 BLACK = (165,42,42)
+HIGHLIGHT = (255,0,0)
 white_in_check = False
 black_in_check = False
 square_size = 80
+check = [False]
 GameDisplay.fill(WHITE)
 
 pygame.display.set_caption('CHESS')
@@ -98,6 +100,14 @@ def Board():
                 pygame.draw.rect(GameDisplay,BLACK,(j*square_size,i*square_size,square_size,square_size))
             k+=1
         k-=1
+    if check[0]:
+        x = check[1]    
+        y = check[2]
+        king = check[3]
+        pygame.draw.rect(GameDisplay,HIGHLIGHT,((y+1)*square_size,(x+1)*square_size,square_size,square_size))
+        for i in board:
+            if king in i:
+                pygame.draw.rect(GameDisplay,HIGHLIGHT,((i.index(king)+1)*square_size,(board.index(i)+1)*square_size,square_size,square_size))
 
     for i in range(8):
         for j in range(8):
@@ -407,54 +417,42 @@ def Check(board,MovingPiece):
     def pawn_check():
         #diagonal down right (black)
         if board[black_kingx+1][black_kingy+1][:2] == 'wp':
-            print('check1..',board[black_kingx+1][black_kingy+1])
             return 'black'
         #diagonal down left (black)
         elif board[black_kingx+1][black_kingy-1][:2] == 'wp':
-            print('check2..',board[black_kingx+1][black_kingy-1])
             return 'black'
         #diagonal up right (white)
         elif board[white_kingx-1][white_kingy+1][:2] == 'bp':
-            print('check3..',board[white_kingx-1][white_kingy+1])
             return 'white'
         #diagonal up left (black)
         elif board[white_kingx-1][white_kingy-1][:2] == 'bp':
-            print('check4..',board[white_kingx-1][white_kingy-1])
             return 'white'
     
     def knight_check():
         def side(x,y,enemy):
             if x+2 < 8 and y+1 < 8:
                 if board[x+2][y+1][:3] == enemy:
-                    print('knight_check1..',board[x+2][y+1])
                     return True
             if x+2 < 8 and y-1 >= 0:
                 if board[x+2][y-1][:3] == enemy:
-                    print('knight_check2..',board[x+2][y-1])
                     return True
             if x+1 < 8 and y+2 < 8:
                 if board[x+1][y+2][:3] == enemy:
-                    print('knight_check3..',board[x+1][y+2])
                     return True
             if  x+1 < 8 and y-2 >= 0:
                 if board[x+1][y-2][:3] == enemy:
-                    print('knight_check4..',board[x+1][y-2])
                     return True
             if x-2 >= 0 and y+1 < 8:
                 if board[x-2][y+1][:3] == enemy:
-                    print('knight_check5..',board[x-2][y+1])
                     return True
             if x-2 >= 0 and y-1 < 8:
                 if board[x-2][y-1][:3] == enemy:
-                    print('knight_check6..',board[x-2][y-1])
                     return True
             if x-1 >= 0 and y+2 < 8:
                 if board[x-1][y+2][:3] == enemy:
-                    print('knight_check7..',board[x-1][y+2])
                     return True
             if x-1 >= 0 and y-2 >= 0:
                 if board[x-1][y-2][:3] == enemy:
-                    print('knight_check8..',board[x-1][y-2])
                     return True
         
         if side(black_kingx,black_kingy,'wkn'):
@@ -475,7 +473,6 @@ def Check(board,MovingPiece):
                     i+=1
                     j+=1
                 elif board[i][j][:2] == enemy:
-                    print('bishop_check1..',board[i][j])
                     k = 1
                     return True
                 else:
@@ -489,7 +486,6 @@ def Check(board,MovingPiece):
                     i-=1
                     j-=1
                 elif board[i][j][:2] == enemy:
-                    print('bishop_check2..',board[i][j])
                     k = 1
                     return True
                 else:
@@ -503,7 +499,6 @@ def Check(board,MovingPiece):
                     i+=1
                     j-=1
                 elif board[i][j][:2] == enemy:
-                    print('bishop_check3..',board[i][j])
                     k = 1
                     return True
                 else:
@@ -517,7 +512,6 @@ def Check(board,MovingPiece):
                     i-=1
                     j+=1
                 elif board[i][j][:2] == enemy:
-                    print('bishop_check4..',board[i][j])
                     k = 1
                     return True
                 else:
@@ -604,6 +598,7 @@ def Check(board,MovingPiece):
     else:
         return False
 
+
 def ClickedSquare(coordinates):
     x = coordinates[0]
     y = coordinates[1]
@@ -640,14 +635,22 @@ while running:
                     if MovingPiece[0] == board[initial_coordinates[0]][initial_coordinates[1]][0]:
                         initial_coordinates = clicked_coords
                     else:
-                        
+
                         fake_board = [i[:] for i in board]
-                        fake_board[clicked_coords[0]][clicked_coords[1]] = MovingPiece
+                        killing_piece = fake_board[initial_coordinates[0]][initial_coordinates[1]]
+                        fake_board[clicked_coords[0]][clicked_coords[1]] = killing_piece
                         fake_board[initial_coordinates[0]][initial_coordinates[1]] = ' '
-                        if Check(fake_board, MovingPiece) == 'black':
+                        for i in fake_board:
+                            print(i)
+                        if Check(fake_board,killing_piece) == 'black':
+                            check = [True,clicked_coords[0],clicked_coords[1],'bk']
                             print('black is under check')
-                        elif Check(fake_board,MovingPiece) == 'white':
+                        elif Check(fake_board,killing_piece) == 'white':
+                            check = [True,clicked_coords[0],clicked_coords[1],'wk']
                             print('white is under check')
+                        else:
+                            print('here')
+                            check = [False]
                         
                         #this is if they try to capture a piece (click on their piece and then the enemy piece)
 
@@ -665,23 +668,26 @@ while running:
                     fake_board[clicked_coords[0]][clicked_coords[1]] = MovingPiece
                     fake_board[initial_coordinates[0]][initial_coordinates[1]] = ' '
 
+                    #so that team cannot move into checking itself
                     if Check(fake_board, MovingPiece) == 'black' and turns%2!=0:
-                        print('black is under check')
+                        print('black is under check')    
                     elif Check(fake_board,MovingPiece) == 'white' and turns%2==0:
                         print('white is under check')
+
                     elif Check(fake_board,MovingPiece) == 'black' and turns%2==0:
                         print('black is under check')
-                        print(initial_coordinates[0],initial_coordinates[1])
+                        check = [True,clicked_coords[0],clicked_coords[1],'bk']
                         move(initial_coordinates,clicked_coords) 
                         step = 0
                         #turns += 1
                     elif Check(fake_board,MovingPiece) == 'white' and turns%2!=0:
                         print('white is under check')
-                        print(initial_coordinates[0],initial_coordinates[1])
+                        check = [True,clicked_coords[0],clicked_coords[1],'wk']
                         move(initial_coordinates,clicked_coords)
                         step = 0
                         #turns += 1
                     else:
+                        check = [False]
                         print(initial_coordinates[0],initial_coordinates[1])
                         move(initial_coordinates,clicked_coords)
                         step = 0
