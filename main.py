@@ -144,6 +144,7 @@ def Board():
 
 
 def move(initial_coords,final_coords):
+    global turns
     initial_x = initial_coords[0]
     initial_y = initial_coords[1]
     final_x = final_coords[0]
@@ -319,7 +320,63 @@ def move(initial_coords,final_coords):
                             valid = False
         print(path,'...path')
         return valid
-            
+    
+    def capture_possibility(initial_x,initial_y,final_x,final_y):
+        possible=False
+        count=0
+        if(IsEmpty(initial_x,initial_y,final_x,final_y)==False):
+            for i in range(0,len(path)-1):
+                if path[i]!=' ':
+                    count+=1
+            if(count==0) and(path[len(path)-1]!=' '):
+                possible=True
+        return possible
+     
+    def white_captures(initial_x,initial_y,final_x,final_y):
+        global turns
+        black_captured_pieces=[]
+        black_captured_pieces.append(board[final_x][final_y])
+        board[final_x][final_y]=' '
+        board[final_x][final_y]=board[initial_x][initial_y]
+        board[initial_x][initial_y]=' ' 
+        Board()
+    def black_captures(initial_x,initial_y,final_x,final_y):
+        white_captured_pieces=[]
+        white_captured_pieces.append(board[final_x][final_y])
+        board[final_x][final_y]=' '
+        board[final_x][final_y]=board[initial_x][initial_y]
+        board[initial_x][initial_y]=' '
+        Board()
+    if((board[initial_x][initial_y][:2]=='wp')and(initial_x-final_x==1)and((math.fabs(initial_y-final_y))==1)and(board[final_x][final_y]!='bk')):
+        if board[final_x][final_y]!=' ':
+            white_captures(initial_x,initial_y,final_x,final_y)
+            return
+    elif((board[initial_x][initial_y][:2]=='bp')and(initial_x-final_x==-1)and((math.fabs(initial_y-final_y))==1)and(board[final_x][final_y]!='wk')):
+        if board[final_x][final_y]!=' ':
+            black_captures(initial_x,initial_y,final_x,final_y)
+            return
+    elif((board[initial_x][initial_y][:3]=='wkn')and(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==2)or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y)==1)and(board[final_x][final_y]!='bk')):
+        if board[final_x][final_y]!=' ':
+            white_captures(initial_x,initial_y,final_x,final_y)
+            return
+    elif((board[initial_x][initial_y][:2]=='bk')and(len(board[initial_x][initial_y])==4)and(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==2)or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y)==1)and(board[final_x][final_y]!='wk')):
+        if board[final_x][final_y]!=' ':
+            black_captures(initial_x,initial_y,final_x,final_y)
+            return
+    elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='wb')and(math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y)and(board[final_x][final_y]!='bk'))):
+        if board[final_x][final_y]!=' ':
+            white_captures(initial_x,initial_y,final_x,final_y)
+            return
+    elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='bb')and(math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y)and(board[final_x][final_y]!='wk'))):
+        if board[final_x][final_y]!=' ':
+            black_captures(initial_x,initial_y,final_x,final_y)
+            return
+    elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='wr')and((initial_x==final_x) or (initial_y==final_y))and(board[final_x][final_y]!='bk')):
+        if board[final_x][final_y]!=' ':
+            white_captures(initial_x,initial_y,final_x,final_y)
+            return
+    
+    ###
     def movement(initial_x,initial_y,final_x,final_y):
         global turns
 
@@ -350,7 +407,6 @@ def move(initial_coords,final_coords):
 
     def knight_move(initial_x,initial_y,final_x,final_y):
         if (math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==2)or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y)==1):
-
             movement(initial_x,initial_y,final_x,final_y)
 
     def bishop_move(initial_x,initial_y,final_x,final_y):
@@ -378,7 +434,7 @@ def move(initial_coords,final_coords):
         white_pawn_first_move(initial_x,initial_y,final_x,final_y)
     
     elif board[initial_x][initial_y][0] == 'b' and board[initial_x][initial_y][1] == 'p'and initial_x==1:
-        black_pawn_first_move(initial_x,initial_y,final_x,final_y)\
+        black_pawn_first_move(initial_x,initial_y,final_x,final_y)
     
     elif board[initial_x][initial_y][0] == 'w' and board[initial_x][initial_y][1] == 'p':
         white_pawn_move(initial_x,initial_y,final_x,final_y)
@@ -539,7 +595,6 @@ def Check(board,MovingPiece):
                 elif board[i][j] == ' ':
                     i+=1
                 elif board[i][j][:2] == enemy:
-                    print('rook_check..',board[i][j])
                     k = 1
                     return True
                 else:
@@ -549,7 +604,6 @@ def Check(board,MovingPiece):
                 if board[i][j] == ' ' or board[i][j]=='bk' or board[i][j]=='wk':
                     j+=1
                 elif board[i][j][:2] == enemy:
-                    print('rook_check..',board[i][j])
                     k = 1
                     return True
                 else:
@@ -559,7 +613,6 @@ def Check(board,MovingPiece):
                 if board[i][j] == ' ' or board[i][j]=='bk' or board[i][j]=='wk':
                     i-=1
                 elif board[i][j][:2] == enemy:
-                    print('rook_check..',board[i][j])
                     k = 1
                     return True
                 else:
@@ -569,7 +622,6 @@ def Check(board,MovingPiece):
                 if board[i][j] == ' ' or board[i][j]=='bk' or board[i][j]=='wk':
                     j-=1
                 elif board[i][j][:2] == enemy:
-                    print('rook_check..',board[i][j])
                     k = 1
                     return True
                 else:
@@ -640,8 +692,7 @@ while running:
                         killing_piece = fake_board[initial_coordinates[0]][initial_coordinates[1]]
                         fake_board[clicked_coords[0]][clicked_coords[1]] = killing_piece
                         fake_board[initial_coordinates[0]][initial_coordinates[1]] = ' '
-                        for i in fake_board:
-                            print(i)
+                        
                         if Check(fake_board,killing_piece) == 'black':
                             check = [True,clicked_coords[0],clicked_coords[1],'bk']
                             print('black is under check')
@@ -649,7 +700,6 @@ while running:
                             check = [True,clicked_coords[0],clicked_coords[1],'wk']
                             print('white is under check')
                         else:
-                            print('here')
                             check = [False]
                         
                         #this is if they try to capture a piece (click on their piece and then the enemy piece)
@@ -657,6 +707,7 @@ while running:
                         print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
 
                         move(initial_coordinates,clicked_coords)
+                        print('babu')
                         
             
                         step = 0
@@ -688,8 +739,8 @@ while running:
                         #turns += 1
                     else:
                         check = [False]
-                        print(initial_coordinates[0],initial_coordinates[1])
                         move(initial_coordinates,clicked_coords)
+
                         step = 0
                         #turns += 1
                 
