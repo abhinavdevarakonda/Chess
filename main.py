@@ -142,38 +142,35 @@ def Board():
                 GameDisplay.blit(white_pawn_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
 
 
-
-def move(initial_coords,final_coords):
-    global turns
-    initial_x = initial_coords[0]
-    initial_y = initial_coords[1]
-    final_x = final_coords[0]
-    final_y = final_coords[1]
-
-    def IsEmpty(initial_x,initial_y,final_x,final_y):
-        global path
+def IsEmpty(initial_x,initial_y,final_x,final_y):
+        global path,path_pos
         path = []
+        path_pos = []
         piece = board[initial_x][initial_y][1:]
         valid = True
         def horizontal_right(ix,iy,fx,fy):
             #ix=fx,iy<fy
             for y in range(iy+1,fy+1):
                 path.append(board[ix][y])
+                path_pos.append([ix,y])
             return path
         def horizontal_left(ix,iy,fx,fy):
             #ix=fx,iy>fy
             for y in range(iy-1,fy-1,-1):
                 path.append(board[ix][y])
+                path_pos.append([ix,y])
             return path
         def vertical_up(ix,iy,fx,fy):
             #ix>fx,iy=fy
             for x in range(ix-1,fx-1,-1):
                 path.append(board[x][iy])
+                path_pos.append([x,iy])
             return path
         def vertical_down(ix,iy,fx,fy):
             #ix<fx,iy=fy
             for x in range(ix+1,fx+1):
                 path.append(board[x][iy])
+                path_pos.append([x,iy])
             return path
         def diagonal_upright(ix,iy,fx,fy):
             #ix>fx,iy<fy
@@ -181,6 +178,7 @@ def move(initial_coords,final_coords):
             x-=1
             for y in range(iy+1,fy+1):
                 path.append(board[x][y])
+                path_pos.append([x,y])
                 x-=1
             return path
         def diagonal_upleft(ix,iy,fx,fy):
@@ -189,6 +187,7 @@ def move(initial_coords,final_coords):
             x-=1
             for y in range(iy-1,fy-1,-1):
                 path.append(board[x][y])
+                path_pos.append([x,y])
                 x-=1
             return path
         def diagonal_downright(ix,iy,fx,fy):
@@ -197,6 +196,7 @@ def move(initial_coords,final_coords):
             x+=1
             for y in range(iy+1,fy+1):
                 path.append(board[x][y])
+                path_pos.append([x,y])
                 x+=1
             return path
         def diagonal_downleft(ix,iy,fx,fy):
@@ -205,6 +205,7 @@ def move(initial_coords,final_coords):
             x+=1
             for y in range(iy-1,fy-1,-1):
                 path.append(board[x][y])
+                path_pos.append([x,y])
                 x+=1
             return path
         
@@ -215,10 +216,12 @@ def move(initial_coords,final_coords):
             if initial_x < final_x:
                 for i in range(initial_x+1,final_x+1):
                     path.append(board[i][initial_y])
+                    path_pos.append(i,initial_y)
             else:
                 
                 for i in range(initial_x-1,final_x-1,-1):
                     path.append(board[i][initial_y])
+                    path_pos.append(i,initial_y)
 
             for i in path:
                 if i != ' ':
@@ -318,8 +321,15 @@ def move(initial_coords,final_coords):
                     for i in diagonal_downright(initial_x,initial_y,final_x,final_y):
                         if i != ' ':
                             valid = False
-        print(path,'...path')
         return valid
+    
+def move(initial_coords,final_coords):
+    global turns
+    initial_x = initial_coords[0]
+    initial_y = initial_coords[1]
+    final_x = final_coords[0]
+    final_y = final_coords[1]
+
     
     def capture_possibility(initial_x,initial_y,final_x,final_y):
         possible=False
@@ -457,7 +467,7 @@ def move(initial_coords,final_coords):
     elif board[initial_x][initial_y][1] == 'k'and len(board[initial_x][initial_y])==2:
         king_move(initial_x,initial_y,final_x,final_y)
     
-    
+
 def Check(board,MovingPiece):
     for i in board:
         if 'bk' in i:
@@ -650,6 +660,171 @@ def Check(board,MovingPiece):
     else:
         return False
 
+def CheckMate(board,MovingPiece,king):
+    #conditions for checkmate:
+    #if king can't get out
+    #if checking piece can't be blocked
+    #if checking piece can't be captured
+    
+    for i in board:
+        if king in i:
+            kingx = board.index(i)
+            kingy = i.index(king)
+            checkedKing = [kingx,kingy]
+        elif MovingPiece in i:
+            enemyx = board.index(i)
+            enemyy = i.index(MovingPiece)
+
+    def checkEscape():
+        #king has 8 possible moves
+        #up
+        if kingx>0 and fake_board[kingx-1][kingy]==' ': 
+            fake_board[kingx-1][kingy] = fake_board[kingx][kingy]
+            fake_board[kingx][kingy] = ' '
+            if Check(fake_board,MovingPiece) == False:
+                return True
+        #down
+        if kingx<7 and fake_board[kingx+1][kingy]==' ':
+            fake_board[kingx+1][kingy] = fake_board[kingx][kingy]
+            fake_board[kingx][kingy] = ' '
+            if Check(fake_board,MovingPiece) == False:
+                return True
+        #left
+        if kingy>0 and fake_board[kingx][kingy-1]==' ':
+            fake_board[kingx][kingy-1] = fake_board[kingx][kingy]
+            fake_board[kingx][kingy] = ' '
+            if Check(fake_board,MovingPiece) == False:
+                return True
+        #right
+        if kingy<7 and fake_board[kingx][kingy+1]==' ':
+            fake_board[kingx][kingy+1] = fake_board[kingx][kingy]
+            fake_board[kingx][kingy] = ' '
+            if Check(fake_baord,MovingPiece) == False:
+                return True
+
+        #upleft
+        if kingx>0 and kingy>0 and fake_board[kingx-1][kingy-1]==' ':
+            fake_board[kingx-1][kingy-1] = fake_board[kingx][kingy]
+            fake_board[kingx][kingy] = ' '
+            if Check(fake_board,MovingPiece) == False:
+                return True
+        #upright
+        if kingx>0 and kingy<7 and fake_board[kingx-1][kingy+1]==' ':
+            fake_board[kingx-1][kingy+1] = fake_board[kingx][kingy]
+            fake_board[kingx][kingy] = ' '
+            if Check(fake_board,MovingPiece) == False:
+                return True
+        #downleft
+        if kingx<7 and kingy>0 and fake_board[kingx+1][kingy-1]==' ':
+            fake_board[kingx+1][kingy-1] = fake_board[kingx][kingy]
+            fake_board[kingx][kingy] = ' '
+            if Check(fake_board,MovingPiece) == False:
+                return True
+        #downright
+        if kingx<7 and kingy<7 and fake_board[kingx+1][kingy+1]==' ':
+            fake_board[kingx+1][kingy+1] = fake_board[kingx][kingy]
+            fake_board[kingx][kingy] = ' '
+            if Check(fake_board,MovingPiece) == False:
+                return True     
+
+        return False
+        
+            
+    def checkBlock():
+        IsEmpty(kingx,kingy,enemyx,enemyy) #this is just to get the path variable from enemy to king
+        del path_pos[-1] #exclude position of enemy piece (only positions that are in between)
+        def blockable(x,y): #to check if certain position can be used to block the check
+            if king == 'wk':
+                team = ['wp','wkn','wb','wr','wq']
+            else:
+                team = ['bp','bkn','bb','br','bq']
+        
+            #pawns
+            if king == 'wk':
+                if (x+1)<8 and board[x+1][y][:2] == team[0]:
+                    print('1')
+                    if IsEmpty(x+1,y,x,y):
+                        return True
+                if (x+2)<8 and board[x+2][y][:2]==team[0] and (x+2)==6:
+                    print('2')
+                    if IsEmpty(x+2,y,x,y):
+                        return True
+            else:
+                if (x-1)>=0 and board[x-1][y][:2] == team[0]:
+                    print('1')
+                    if IsEmpty(x-1,y,x,y):
+                        return True
+                if (x-2)>=0 and board[x-2][y][:2]==team[0] and (x-2)==1:
+                    print('2')
+                    if IsEmpty(x-2,y,x,y):
+                        return True
+
+            #knights
+            #-upleft
+            if (x-1)>=0 and (y-2)>=0 and board[x-1][y-2][:3] == team[1]:
+                print('3')
+                if IsEmpty(x-1,y-2,x,y):
+                    return True
+            if (x-2)>=0 and (y-1)>=0 and board[x-2][y-1][:3] == team[1]:
+                print('4')
+                if IsEmpty(x-2,y-1,x,y):
+                    return True
+            #-upright
+            if (x-1)>=0 and (y+2)<8 and board[x-1][y+2][:3] == team[1]:
+                print('5')
+                if IsEmpty(x-1,y+2,x,y):
+                    return True
+            if (x-2)>=0 and (y+1)<8 and board[x-2][y+1][:3] == team[1]:
+                print('6')
+                if IsEmpty(x-2,y+1,x,y):
+                    return True
+            #-downleft
+            if (x+1)<8 and (y-2)>=0 and board[x+1][y-2][:3] == team[1]:
+                print('7')
+                if IsEmpty(x+1,y-2,x,y):
+                    return True
+            if (x+2)<8 and (y-1)>=0 and board[x+2][y-1][:3] == team[1]:
+                print('8')
+                if IsEmpty(x+2,y-1,x,y):
+                    return True
+            #-downright
+            if (x+1)<8 and (y+2)<8 and board[x+1][y+2][:3] == team[1]:
+                print('9')
+                if IsEmpty(x+1,y+2,x,y):
+                    return True
+            if (x+2)<8 and (y+1)<8 and board[x+2][y+1][:3] == team[1]:
+                print('10')
+                if IsEmpty(x+2,y+1,x,y):
+                    return True
+            
+            
+            #bishops
+                
+
+                
+            else:
+                pass
+        count = 0
+        for i in path_pos:
+            print(i)
+            if blockable(i[0],i[1]):
+                return True
+            else:
+                count+=1
+                pass
+        if count==len(path_pos):
+            return False
+            
+            
+
+
+    def checkTake():
+        pass
+    checkList = [checkEscape(),checkBlock(),checkTake()]
+    if True not in checkList:
+        return True
+    else:
+        return False
 
 def ClickedSquare(coordinates):
     x = coordinates[0]
@@ -707,7 +882,6 @@ while running:
                         print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
 
                         move(initial_coordinates,clicked_coords)
-                        print('babu')
                         
             
                         step = 0
@@ -728,13 +902,17 @@ while running:
                     elif Check(fake_board,MovingPiece) == 'black' and turns%2==0:
                         print('black is under check')
                         check = [True,clicked_coords[0],clicked_coords[1],'bk']
-                        move(initial_coordinates,clicked_coords) 
+                        move(initial_coordinates,clicked_coords)
+                        if CheckMate(fake_board, MovingPiece,'bk'):
+                            print('checkmate! White wins!') 
                         step = 0
                         #turns += 1
                     elif Check(fake_board,MovingPiece) == 'white' and turns%2!=0:
                         print('white is under check')
                         check = [True,clicked_coords[0],clicked_coords[1],'wk']
                         move(initial_coordinates,clicked_coords)
+                        if CheckMate(fake_board, MovingPiece,'wk'):
+                            print('checkmate! Black wins!')
                         step = 0
                         #turns += 1
                     else:
