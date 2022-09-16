@@ -381,7 +381,7 @@ def move(initial_coords,final_coords):
         if board[final_x][final_y]!=' ':
             black_captures(initial_x,initial_y,final_x,final_y)
             return
-    elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='wr')and((initial_x==final_x) or (initial_y==final_y))and(board[final_x][final_y]!='bk')):
+    elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='wr')and((initial_x==final_x)or(initial_y==final_y))and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
             white_captures(initial_x,initial_y,final_x,final_y)
             return
@@ -435,7 +435,7 @@ def move(initial_coords,final_coords):
                 movement(initial_x,initial_y,final_x,final_y)
 
     def king_move(initial_x,initial_y,final_x,final_y):
-        if((math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==0 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==0)):
+        if((math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==1) or (math.fabs(final_x-initial_x)==0 and math.fabs(final_y-initial_y)==1) or (math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==0)):
             if IsEmpty(initial_x, initial_y, final_x, final_y):
                 movement(initial_x,initial_y,final_x,final_y)
 
@@ -733,6 +733,7 @@ def CheckMate(board,MovingPiece,king):
     def checkBlock():
         IsEmpty(kingx,kingy,enemyx,enemyy) #this is just to get the path variable from enemy to king
         del path_pos[-1] #exclude position of enemy piece (only positions that are in between)
+
         def blockable(x,y): #to check if certain position can be used to block the check
             temp_x = x
             temp_y = y
@@ -895,9 +896,14 @@ def CheckMate(board,MovingPiece,king):
                 pass
         if count==len(path_pos):
             return False
-            
+        
+
     def checkTake():
         pass
+
+
+
+        
     checkList = [checkEscape(),checkBlock(),checkTake()]
     if True not in checkList:
         return True
@@ -930,7 +936,7 @@ while running:
                 if clicked_coords[0] < 0 or clicked_coords[1] < 0:
                     pass
                 elif item != ' ' and step==0:
-                    if (turns%2==0 and board[clicked_coords[0]][clicked_coords[1]][0] == 'w') or (turns%2==1 and board[clicked_coords[0]][clicked_coords[1]][0] == 'b'):
+                    if (turns%2==0 and board[clicked_coords[0]][clicked_coords[1]][0] == 'w')or(turns%2==1 and board[clicked_coords[0]][clicked_coords[1]][0] == 'b'):
                         initial_coordinates = clicked_coords
                         MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
                         step = 1
