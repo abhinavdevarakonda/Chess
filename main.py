@@ -699,7 +699,7 @@ def CheckMate(board,MovingPiece,king):
         if kingy<7 and fake_board[kingx][kingy+1]==' ':
             fake_board[kingx][kingy+1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
-            if Check(fake_baord,MovingPiece) == False:
+            if Check(fake_board,MovingPiece) == False:
                 return True
 
         #upleft
@@ -734,6 +734,8 @@ def CheckMate(board,MovingPiece,king):
         IsEmpty(kingx,kingy,enemyx,enemyy) #this is just to get the path variable from enemy to king
         del path_pos[-1] #exclude position of enemy piece (only positions that are in between)
         def blockable(x,y): #to check if certain position can be used to block the check
+            temp_x = x
+            temp_y = y
             if king == 'wk':
                 team = ['wp','wkn','wb','wr','wq']
             else:
@@ -797,13 +799,92 @@ def CheckMate(board,MovingPiece,king):
                 if IsEmpty(x+2,y+1,x,y):
                     return True
             
-            
-            #bishops
-                
 
-                
+            #bishops
+            #-upleft
+            temp_x = x
+            temp_y = y
+            while (temp_x-1)>=0 and (temp_y-1)>=0:
+                if board[temp_x-1][temp_y-1][:2] == team[2]:
+                    print('11')
+                    if IsEmpty(x-1,y-1,x,y):
+                        return True
+                temp_x-=1
+                temp_y-=1
+
+            #-upright
+            temp_x = x
+            temp_y = y
+            while (temp_x-1)>=0 and (temp_y+1)<8:
+                if board[temp_x-1][temp_y+1][:2] == team[2]:
+                    print('12')
+                    if IsEmpty(temp_x-1,temp_y+1,x,y):
+                        return True
+                temp_x-=1
+                temp_y+=1
+            #-downleft
+            temp_x = x
+            temp_y = y
+            while (temp_x+1)<8 and (temp_y-1)<8:
+                if board[temp_x+1][temp_y-1][:2] == team[2]:
+                    print('13')
+                    if IsEmpty(temp_x+1,temp_y-1,x,y):
+                        return True
+                temp_x+=1
+                temp_y-=1
+            #-downright
+            temp_x = x
+            temp_y = y
+            while (temp_x+1)<8 and (temp_y+1)<8:
+                if board[temp_x+1][temp_y+1][:2] == team[2]:
+                    print('14')
+                    if IsEmpty(temp_x+1,temp_y+1,x,y):
+                        return True
+                temp_x+=1
+                temp_y+=1
+
             else:
                 pass
+
+            #rooks
+            #-up
+            temp_x = x
+            temp_y = y
+            while (temp_x-1)>=0:
+                if board[temp_x-1][temp_y][:2] in [team[3],team[4]]:
+                    print('15')
+                    if IsEmpty(temp_x-1,temp_y,x,y):
+                        return True
+                temp_x-=1
+            #-down
+            temp_x = x
+            temp_y = y
+            while(temp_x+1)<8:
+                if board[temp_x+1][temp_y][:2] in [team[3],team[4]]:
+                    print('16')
+                    if IsEmpty(temp_x+1,temp_y,x,y):
+                        return True
+                temp_x+=1
+            #-left
+            temp_x = x
+            temp_y = y
+            while(temp_y-1>=0):
+                if board[temp_x][temp_y-1][:2] in [team[3],team[4]]:
+                    print('17')
+                    if IsEmpty(temp_x,temp_y-1,x,y):
+                        print(board[temp_x][temp_y-1])
+                        return True
+                temp_y-=1
+            #-right
+            temp_x = x
+            temp_y = y
+            while(temp_y+1<8):
+                if board[temp_x][temp_y+1][:2] in [team[3],team[4]]:
+                    print('18')
+                    if IsEmpty(temp_x,temp_y+1,x,y):
+                        return True
+                temp_y+=1
+            
         count = 0
         for i in path_pos:
             print(i)
@@ -815,9 +896,6 @@ def CheckMate(board,MovingPiece,king):
         if count==len(path_pos):
             return False
             
-            
-
-
     def checkTake():
         pass
     checkList = [checkEscape(),checkBlock(),checkTake()]
