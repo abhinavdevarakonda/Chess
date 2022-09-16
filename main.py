@@ -359,51 +359,51 @@ def move(initial_coords,final_coords):
     if((board[initial_x][initial_y][:2]=='wp')and(initial_x-final_x==1)and((math.fabs(initial_y-final_y))==1)and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
             white_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((board[initial_x][initial_y][:2]=='bp')and(initial_x-final_x==-1)and((math.fabs(initial_y-final_y))==1)and(board[final_x][final_y]!='wk')):
         if board[final_x][final_y]!=' ':
             black_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((board[initial_x][initial_y][:3]=='wkn')and(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==2)or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y)==1)and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
             white_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((board[initial_x][initial_y][:2]=='bk')and(len(board[initial_x][initial_y])==4)and(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==2)or(math.fabs(final_x-initial_x)==2 and math.fabs(final_y-initial_y)==1)and(board[final_x][final_y]!='wk')):
         if board[final_x][final_y]!=' ':
             black_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='wb')and(math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y)and(board[final_x][final_y]!='bk'))):
         if board[final_x][final_y]!=' ':
             white_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='bb')and(math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y)and(board[final_x][final_y]!='wk'))):
         if board[final_x][final_y]!=' ':
             black_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='wr')and((initial_x==final_x)or(initial_y==final_y))and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
             white_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y][:2]=='br')and((initial_x==final_x) or (initial_y==final_y))and(board[final_x][final_y]!='wk')):
         if board[final_x][final_y]!=' ':
             black_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y]=='wq')and(((initial_x==final_x) or (initial_y==final_y)) or ((math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y))))and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
             white_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y]=='bq')and(((initial_x==final_x) or (initial_y==final_y)) or ((math.fabs(final_x-initial_x)==math.fabs(final_y-initial_y))))and(board[final_x][final_y]!='wk')):
         if board[final_x][final_y]!=' ':
             black_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y]=='wk')and(((math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==0 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==0)))and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
             white_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y]=='bk')and(((math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==0 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==0)))and(board[final_x][final_y]!='wk')):
         if board[final_x][final_y]!=' ':
             black_captures(initial_x,initial_y,final_x,final_y)
-            return
+            return True
     
     ###
     def movement(initial_x,initial_y,final_x,final_y):
@@ -982,11 +982,9 @@ while running:
 
                         print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
 
-                        move(initial_coordinates,clicked_coords)
-                        
-            
-                        step = 0
-                        turns += 1
+                        if move(initial_coordinates,clicked_coords):
+                            step = 0
+                            turns += 1
 
                 elif item == ' ' and step == 1:
                     
