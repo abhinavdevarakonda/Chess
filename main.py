@@ -330,7 +330,6 @@ def move(initial_coords,final_coords):
     final_x = final_coords[0]
     final_y = final_coords[1]
 
-    
     def capture_possibility(initial_x,initial_y,final_x,final_y):
         possible=False
         count=0
@@ -752,7 +751,6 @@ def CheckMate(board,MovingPiece,king):
             
     def checkBlock():
         IsEmpty(kingx,kingy,enemyx,enemyy) #this is just to get the path variable from enemy to king
-        del path_pos[-1] #exclude position of enemy piece (only positions that are in between)
 
         def blockable(x,y): #to check if certain position can be used to block the check
             temp_x = x
@@ -768,6 +766,7 @@ def CheckMate(board,MovingPiece,king):
                     print('1')
                     if IsEmpty(x+1,y,x,y):
                         return True
+
                 if (x+2)<8 and board[x+2][y][:2]==team[0] and (x+2)==6:
                     print('2')
                     if IsEmpty(x+2,y,x,y):
@@ -907,7 +906,7 @@ def CheckMate(board,MovingPiece,king):
                 temp_y+=1
             
         count = 0
-        for i in path_pos:
+        for i in path_pos[:len(path_pos)-1]:
             print(i)
             if blockable(i[0],i[1]):
                 return True
@@ -917,13 +916,11 @@ def CheckMate(board,MovingPiece,king):
         if count==len(path_pos):
             return False
         
-
     def checkTake():
         pass
+    
 
 
-
-        
     checkList = [checkEscape(),checkBlock(),checkTake()]
     if True not in checkList:
         return True
