@@ -6,16 +6,21 @@ HEIGHT = 800
 WIDTH = 800
 pygame.init()
 
+
 GameDisplay = pygame.display.set_mode((800,800))
 
 #############INITIAL BOARD DRAWING######################
 WHITE = (255,255,255)
 BLACK = (165,42,42)
-HIGHLIGHT = (255,0,0)
+CHECK_HIGHLIGHT = (255,0,0)
+HIGHLIGHT = (255,255,0)
+
+game_over = [False]
 white_in_check = False
 black_in_check = False
 square_size = 80
 check = [False]
+highlight = [False]
 GameDisplay.fill(WHITE)
 
 pygame.display.set_caption('CHESS')
@@ -104,10 +109,15 @@ def Board():
         x = check[1]    
         y = check[2]
         king = check[3]
-        pygame.draw.rect(GameDisplay,HIGHLIGHT,((y+1)*square_size,(x+1)*square_size,square_size,square_size))
+        pygame.draw.rect(GameDisplay,CHECK_HIGHLIGHT,((y+1)*square_size,(x+1)*square_size,square_size,square_size))
         for i in board:
             if king in i:
-                pygame.draw.rect(GameDisplay,HIGHLIGHT,((i.index(king)+1)*square_size,(board.index(i)+1)*square_size,square_size,square_size))
+                pygame.draw.rect(GameDisplay,CHECK_HIGHLIGHT,((i.index(king)+1)*square_size,(board.index(i)+1)*square_size,square_size,square_size))
+    
+    if highlight[0]:
+        x = highlight[1]
+        y = highlight[2]
+        pygame.draw.rect(GameDisplay,HIGHLIGHT,((y+1)*square_size,(x+1)*square_size,square_size,square_size))
 
     for i in range(8):
         for j in range(8):
@@ -999,6 +1009,19 @@ def CheckMate(board,MovingPiece,king):
     else:
         return False
 
+def displayWinner(winner):
+    if winner == 'white':
+        white_win_img=pygame.image.load('pieces/white_win.jpg')
+        #white_win_img=pygame.transform.scale(white_win_img,(80,80))
+        GameDisplay.blit(white_win_img,(HEIGHT//2,WIDTH//2))
+        #displayWinner('white')
+    elif winner == 'black':
+        black_win_img=pygame.image.load('pieces/black_win.jpg')
+        #black_win_img=pygame.transform.scale(black_win_img,(80,80))
+        GameDisplay.blit(black_win_img,(HEIGHT//2,WIDTH//2))
+        #displayWinner('black')
+
+
 def ClickedSquare(coordinates):
     x = coordinates[0]
     y = coordinates[1]
@@ -1028,13 +1051,18 @@ while running:
                     if (turns%2==0 and board[clicked_coords[0]][clicked_coords[1]][0] == 'w')or(turns%2==1 and board[clicked_coords[0]][clicked_coords[1]][0] == 'b'):
                         initial_coordinates = clicked_coords
                         MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
+                        highlight = [True,clicked_coords[0],clicked_coords[1]]
+                        Board()
+                        highlight = [False]
                         step = 1
                 elif item !=' ' and step==1:
                     #if the piece they clicked on is of same colour as their initial click
                     MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
                     if MovingPiece[0] == board[initial_coordinates[0]][initial_coordinates[1]][0]:
                         initial_coordinates = clicked_coords
-                    
+                        highlight = [True,clicked_coords[0],clicked_coords[1]]
+                        Board()
+                        highlight = [False]
                     #this is if they try to capture a piece (click on their piece and then the enemy piece)
                     else:
                         fake_board = [i[:] for i in board]
@@ -1046,13 +1074,22 @@ while running:
                             check = [True,clicked_coords[0],clicked_coords[1],'bk']
                             print('black is under check')
                             if CheckMate(fake_board,killing_piece,'bk'):
-                                print('checkmate! White wins!')
+                                print('checkmate! White wins!3')
+                                game_over = [True,'white']
+                                
+                                white_win_img=pygame.image.load('pieces/white_win.jpg')
+                                white_win_img=pygame.transform.scale(white_win_img,(80,80))
+                                GameDisplay.blit(white_win_img,(HEIGHT//2,WIDTH//2))
+                                game_over = [True,'white']
+                                
 
                         elif Check(fake_board,killing_piece) == 'white':
                             check = [True,clicked_coords[0],clicked_coords[1],'wk']
                             print('white is under check')
                             if CheckMate(fake_board,killing_piece,'wk'):
-                                print('checkmate! Black wins!')
+                                print('checkmate! Black wins!4')
+                                game_over = [True,'black']
+                                
                         else:
                             check = [False]
                         
@@ -1091,7 +1128,8 @@ while running:
                         check = [True,clicked_coords[0],clicked_coords[1],'bk']
                         move(initial_coordinates,clicked_coords)
                         if CheckMate(fake_board, MovingPiece,'bk'):
-                            print('checkmate! White wins!') 
+                            print('checkmate! White wins!1')
+                            game_over = [True,'white']
                         step = 0
                         #turns += 1
                     elif Check(fake_board,MovingPiece) == 'white' and turns%2!=0:
@@ -1099,7 +1137,8 @@ while running:
                         check = [True,clicked_coords[0],clicked_coords[1],'wk']
                         move(initial_coordinates,clicked_coords)
                         if CheckMate(fake_board, MovingPiece,'wk'):
-                            print('checkmate! Black wins!')
+                            print('checkmate! Black wins!2')
+                            game_over = [True,'black']
                         step = 0
                         #turns += 1
                     else:
@@ -1108,7 +1147,8 @@ while running:
 
                         step = 0
                         #turns += 1
-                
+                if game_over[0]:
+                    displayWinner(game_over[1])
             except IndexError:
                 pass
                 
