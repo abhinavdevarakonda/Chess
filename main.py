@@ -398,12 +398,34 @@ def move(initial_coords,final_coords):
             return True
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y]=='wk')and(((math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==0 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==0)))and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
-            white_captures(initial_x,initial_y,final_x,final_y)
-            return True
+            fake_board = [i[:] for i in board]
+            print(final_x,final_y)
+            print(initial_x,initial_y,'..in')
+
+            fake_board[final_x][final_y] = fake_board[initial_x][initial_y]
+            fake_board[initial_x][initial_y] = ' '
+
+            for i in fake_board:
+                print(i)
+
+            if Check(fake_board,MovingPiece):
+                print('here')
+                return False
+            else:
+                white_captures(initial_x,initial_y,final_x,final_y)
+                return True
+                
     elif((capture_possibility(initial_x,initial_y,final_x,final_y))and(board[initial_x][initial_y]=='bk')and(((math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==0 and math.fabs(final_y-initial_y)==1)or(math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==0)))and(board[final_x][final_y]!='wk')):
         if board[final_x][final_y]!=' ':
             black_captures(initial_x,initial_y,final_x,final_y)
-            return True
+            
+            fake_board = [i[:] for i in board]
+            fake_board[final_x][final_y] = fake_board[initial_x][initial_y]
+            fake_board[initial_x][initial_y] = ' '
+            if Check(fake_board,MovingPiece):
+                return False
+            else:
+                return True
     
     ###
     def movement(initial_x,initial_y,final_x,final_y):
@@ -495,10 +517,9 @@ def Check(board,MovingPiece):
         elif 'wk' in i:
             white_kingx = board.index(i)
             white_kingy = i.index('wk')
-
     white_king = [white_kingx,white_kingy]
     black_king = [black_kingx,black_kingy]
-        
+
     def pawn_check():
         #diagonal down right (black)
         if board[black_kingx+1][black_kingy+1][:2] == 'wp':
@@ -666,8 +687,10 @@ def Check(board,MovingPiece):
         elif side(black_kingx,black_kingy,'wq'):
             return 'black'
                 
-    
-    #print(bishop_check())
+    def king_check():
+        if MovingPiece == 'wk' or 'bk':    
+            pass
+
     if pawn_check():
         return pawn_check()
     elif knight_check():
@@ -684,13 +707,12 @@ def CheckMate(board,MovingPiece,king):
     #if king can't get out
     #if checking piece can't be blocked
     #if checking piece can't be captured
-    
     for i in board:
         if king in i:
             kingx = board.index(i)
             kingy = i.index(king)
             checkedKing = [kingx,kingy]
-        elif MovingPiece in i:
+        if MovingPiece in i:
             enemyx = board.index(i)
             enemyy = i.index(MovingPiece)
 
@@ -765,12 +787,13 @@ def CheckMate(board,MovingPiece,king):
             temp_x = x
             temp_y = y
             if king == 'wk':
-                team = ['wp','wkn','wb','wr','wq']
+                team = ['wp','wkn','wb','wr','wq','wk']
             else:
-                team = ['bp','bkn','bb','br','bq']
+                team = ['bp','bkn','bb','br','bq','bk']
         
             #pawns
             if checkTake == False:
+                #pawn
                 if king == 'wk':
                     if (x+1)<8 and board[x+1][y][:2] == team[0]:
                         print('1')
@@ -791,7 +814,33 @@ def CheckMate(board,MovingPiece,king):
                         if IsEmpty(x-2,y,x,y):
                             return True
             else:
-                print('checktake')
+                '''
+                #if king can take the attacker:
+                #-up
+                if (x+1)<8 and board[x+1][y] == team[5]:
+                    return True
+                #-down
+                if (x-1)>=0 and board[x-1][y] == team[5]:
+                    return True
+                #-left
+                if (y-1)>=0 and board[x][y-1] == team[5]:
+                    return True
+                #-right
+                if (y+1)<8 and board[x][y+1] == team[5]:
+                    return True
+                #-upright
+                if (x+1)<8 and (y-1)>=0 and board[x+1][y-1] == team[5]:
+                    return True
+                #-upleft
+                if (x+1)<8 and (y+1)<8 and board[x+1][y+1] == team[5]:
+                    return True
+                #-downright
+                if (x-1)>=0 and (y-1)>=0 and board[x-1][y-1] == team[5]:
+                    return True
+                #-downleft
+                if (x-1)>=0 and (y+1)<8 and board[x-1][y+1] == team[5]:
+                    return True
+                '''
                 if king == 'wk':
                     if (x+1)<8 and (y-1)>=0 and board[x+1][y-1][:2] == team[0]:
                         return True
@@ -1021,8 +1070,9 @@ while running:
                     MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
                     if MovingPiece[0] == board[initial_coordinates[0]][initial_coordinates[1]][0]:
                         initial_coordinates = clicked_coords
+                    
+                    #this is if they try to capture a piece (click on their piece and then the enemy piece)
                     else:
-
                         fake_board = [i[:] for i in board]
                         killing_piece = fake_board[initial_coordinates[0]][initial_coordinates[1]]
                         fake_board[clicked_coords[0]][clicked_coords[1]] = killing_piece
@@ -1031,19 +1081,32 @@ while running:
                         if Check(fake_board,killing_piece) == 'black':
                             check = [True,clicked_coords[0],clicked_coords[1],'bk']
                             print('black is under check')
+                            if CheckMate(fake_board,killing_piece,'bk'):
+                                print('checkmate! White wins!')
+
                         elif Check(fake_board,killing_piece) == 'white':
                             check = [True,clicked_coords[0],clicked_coords[1],'wk']
                             print('white is under check')
+                            if CheckMate(fake_board,killing_piece,'wk'):
+                                print('checkmate! Black wins!')
                         else:
                             check = [False]
                         
-                        #this is if they try to capture a piece (click on their piece and then the enemy piece)
 
                         print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
-
-                        if move(initial_coordinates,clicked_coords):
+                            
+                        if Check(fake_board, MovingPiece) == 'black' and turns%2!=0:
+                            print('black moving into check')
+                            print('black is under check')    
                             step = 0
-                            turns += 1
+                        elif Check(fake_board,MovingPiece) == 'white' and turns%2==0:
+                            print('white moving into check')
+                            print('white is under check')
+                            step = 0
+                        else:
+                            if move(initial_coordinates,clicked_coords):
+                                step = 0
+                                turns += 1
 
                 elif item == ' ' and step == 1:
                     
@@ -1054,8 +1117,10 @@ while running:
                     #so that team cannot move into checking itself
                     if Check(fake_board, MovingPiece) == 'black' and turns%2!=0:
                         print('black is under check')    
+                        step = 0
                     elif Check(fake_board,MovingPiece) == 'white' and turns%2==0:
                         print('white is under check')
+                        step = 0
 
                     elif Check(fake_board,MovingPiece) == 'black' and turns%2==0:
                         print('black is under check')
