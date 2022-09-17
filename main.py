@@ -697,24 +697,28 @@ def CheckMate(board,MovingPiece,king):
     def checkEscape():
         #king has 8 possible moves
         #up
+        fake_board = [i[:] for i in board]
         if kingx>0 and fake_board[kingx-1][kingy]==' ': 
             fake_board[kingx-1][kingy] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
             if Check(fake_board,MovingPiece) == False:
                 return True
         #down
+        fake_board = [i[:] for i in board]
         if kingx<7 and fake_board[kingx+1][kingy]==' ':
             fake_board[kingx+1][kingy] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
             if Check(fake_board,MovingPiece) == False:
                 return True
         #left
+        fake_board = [i[:] for i in board]
         if kingy>0 and fake_board[kingx][kingy-1]==' ':
             fake_board[kingx][kingy-1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
             if Check(fake_board,MovingPiece) == False:
                 return True
         #right
+        fake_board = [i[:] for i in board]
         if kingy<7 and fake_board[kingx][kingy+1]==' ':
             fake_board[kingx][kingy+1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
@@ -722,24 +726,28 @@ def CheckMate(board,MovingPiece,king):
                 return True
 
         #upleft
+        fake_board = [i[:] for i in board]
         if kingx>0 and kingy>0 and fake_board[kingx-1][kingy-1]==' ':
             fake_board[kingx-1][kingy-1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
             if Check(fake_board,MovingPiece) == False:
                 return True
         #upright
+        fake_board = [i[:] for i in board]
         if kingx>0 and kingy<7 and fake_board[kingx-1][kingy+1]==' ':
             fake_board[kingx-1][kingy+1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
             if Check(fake_board,MovingPiece) == False:
                 return True
         #downleft
+        fake_board = [i[:] for i in board]
         if kingx<7 and kingy>0 and fake_board[kingx+1][kingy-1]==' ':
             fake_board[kingx+1][kingy-1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
             if Check(fake_board,MovingPiece) == False:
                 return True
         #downright
+        fake_board = [i[:] for i in board]
         if kingx<7 and kingy<7 and fake_board[kingx+1][kingy+1]==' ':
             fake_board[kingx+1][kingy+1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
@@ -750,9 +758,10 @@ def CheckMate(board,MovingPiece,king):
         
             
     def checkBlock():
+        checkTake = False
         IsEmpty(kingx,kingy,enemyx,enemyy) #this is just to get the path variable from enemy to king
 
-        def blockable(x,y): #to check if certain position can be used to block the check
+        def blockable(x,y,checkTake=False):
             temp_x = x
             temp_y = y
             if king == 'wk':
@@ -761,24 +770,37 @@ def CheckMate(board,MovingPiece,king):
                 team = ['bp','bkn','bb','br','bq']
         
             #pawns
-            if king == 'wk':
-                if (x+1)<8 and board[x+1][y][:2] == team[0]:
-                    print('1')
-                    if IsEmpty(x+1,y,x,y):
-                        return True
+            if checkTake == False:
+                if king == 'wk':
+                    if (x+1)<8 and board[x+1][y][:2] == team[0]:
+                        print('1')
+                        if IsEmpty(x+1,y,x,y):
+                            return True
 
-                if (x+2)<8 and board[x+2][y][:2]==team[0] and (x+2)==6:
-                    print('2')
-                    if IsEmpty(x+2,y,x,y):
-                        return True
+                    if (x+2)<8 and board[x+2][y][:2]==team[0] and (x+2)==6:
+                        print('2')
+                        if IsEmpty(x+2,y,x,y):
+                            return True
+                else:
+                    if (x-1)>=0 and board[x-1][y][:2] == team[0]:
+                        print('1')
+                        if IsEmpty(x-1,y,x,y):
+                            return True
+                    if (x-2)>=0 and board[x-2][y][:2]==team[0] and (x-2)==1:
+                        print('2')
+                        if IsEmpty(x-2,y,x,y):
+                            return True
             else:
-                if (x-1)>=0 and board[x-1][y][:2] == team[0]:
-                    print('1')
-                    if IsEmpty(x-1,y,x,y):
+                print('checktake')
+                if king == 'wk':
+                    if (x+1)<8 and (y-1)>=0 and board[x+1][y-1][:2] == team[0]:
                         return True
-                if (x-2)>=0 and board[x-2][y][:2]==team[0] and (x-2)==1:
-                    print('2')
-                    if IsEmpty(x-2,y,x,y):
+                    if (x+1)<8 and (y+1)<8 and board[x+1][y+1][:2] == team[0]:
+                        return True
+                else:
+                    if (x-1)>=0 and (y-1)>=0 and board[x-1][y-1][:2] == team[0]:
+                        return True
+                    if (x-1)>=0 and (y+1)<8 and board[x-1][y+1][:2] == team[0]:
                         return True
 
             #knights
@@ -787,36 +809,52 @@ def CheckMate(board,MovingPiece,king):
                 print('3')
                 if IsEmpty(x-1,y-2,x,y):
                     return True
+                if checkTake:
+                    return True
             if (x-2)>=0 and (y-1)>=0 and board[x-2][y-1][:3] == team[1]:
                 print('4')
                 if IsEmpty(x-2,y-1,x,y):
+                    return True
+                if checkTake:
                     return True
             #-upright
             if (x-1)>=0 and (y+2)<8 and board[x-1][y+2][:3] == team[1]:
                 print('5')
                 if IsEmpty(x-1,y+2,x,y):
                     return True
+                if checkTake:
+                    return True
             if (x-2)>=0 and (y+1)<8 and board[x-2][y+1][:3] == team[1]:
                 print('6')
                 if IsEmpty(x-2,y+1,x,y):
+                    return True
+                if checkTake:
                     return True
             #-downleft
             if (x+1)<8 and (y-2)>=0 and board[x+1][y-2][:3] == team[1]:
                 print('7')
                 if IsEmpty(x+1,y-2,x,y):
                     return True
+                if checkTake:
+                    return True
             if (x+2)<8 and (y-1)>=0 and board[x+2][y-1][:3] == team[1]:
                 print('8')
                 if IsEmpty(x+2,y-1,x,y):
+                    return True
+                if checkTake:
                     return True
             #-downright
             if (x+1)<8 and (y+2)<8 and board[x+1][y+2][:3] == team[1]:
                 print('9')
                 if IsEmpty(x+1,y+2,x,y):
                     return True
+                if checkTake:
+                    return True
             if (x+2)<8 and (y+1)<8 and board[x+2][y+1][:3] == team[1]:
                 print('10')
                 if IsEmpty(x+2,y+1,x,y):
+                    return True
+                if checkTake:
                     return True
             
 
@@ -827,8 +865,11 @@ def CheckMate(board,MovingPiece,king):
             while (temp_x-1)>=0 and (temp_y-1)>=0:
                 if board[temp_x-1][temp_y-1][:2] == team[2]:
                     print('11')
-                    if IsEmpty(x-1,y-1,x,y):
+                    if IsEmpty(temp_x-1,temp_y-1,x,y):
                         return True
+                    if checkTake:
+                        if IsEmpty(temp_x-1,temp_y-1,x+1,y+1):
+                            return True
                 temp_x-=1
                 temp_y-=1
 
@@ -840,6 +881,9 @@ def CheckMate(board,MovingPiece,king):
                     print('12')
                     if IsEmpty(temp_x-1,temp_y+1,x,y):
                         return True
+                    if checkTake:
+                        if IsEmpty(temp_x-1,temp_y+1,x+1,y-1):
+                            return True
                 temp_x-=1
                 temp_y+=1
             #-downleft
@@ -850,6 +894,9 @@ def CheckMate(board,MovingPiece,king):
                     print('13')
                     if IsEmpty(temp_x+1,temp_y-1,x,y):
                         return True
+                    if checkTake:
+                        if IsEmpty(temp_x+1,temp_y-1,x-1,y+1):
+                            return True
                 temp_x+=1
                 temp_y-=1
             #-downright
@@ -860,6 +907,9 @@ def CheckMate(board,MovingPiece,king):
                     print('14')
                     if IsEmpty(temp_x+1,temp_y+1,x,y):
                         return True
+                    if checkTake:
+                        if IsEmpty(temp_x+1,temp_y+1,x-1,y-1):
+                            return True
                 temp_x+=1
                 temp_y+=1
 
@@ -875,6 +925,9 @@ def CheckMate(board,MovingPiece,king):
                     print('15')
                     if IsEmpty(temp_x-1,temp_y,x,y):
                         return True
+                    if checkTake:
+                        if IsEmpty(temp_x-1,temp_y,x+1,y):
+                            return True
                 temp_x-=1
             #-down
             temp_x = x
@@ -884,6 +937,9 @@ def CheckMate(board,MovingPiece,king):
                     print('16')
                     if IsEmpty(temp_x+1,temp_y,x,y):
                         return True
+                    if checkTake:
+                        if IsEmpty(temp_x+1,temp_y,x-1,y):
+                            return True
                 temp_x+=1
             #-left
             temp_x = x
@@ -892,8 +948,10 @@ def CheckMate(board,MovingPiece,king):
                 if board[temp_x][temp_y-1][:2] in [team[3],team[4]]:
                     print('17')
                     if IsEmpty(temp_x,temp_y-1,x,y):
-                        print(board[temp_x][temp_y-1])
                         return True
+                    if checkTake:
+                        if IsEmpty(temp_x,temp_y-1,x,y+1):
+                            return True
                 temp_y-=1
             #-right
             temp_x = x
@@ -903,25 +961,26 @@ def CheckMate(board,MovingPiece,king):
                     print('18')
                     if IsEmpty(temp_x,temp_y+1,x,y):
                         return True
+                    if checkTake:
+                        if IsEmpty(temp_x,temp_y+1,x,y-1):
+                            return True
                 temp_y+=1
             
-        count = 0
         for i in path_pos[:len(path_pos)-1]:
             print(i)
             if blockable(i[0],i[1]):
                 return True
-            else:
-                count+=1
-                pass
-        if count==len(path_pos):
-            return False
+
         
-    def checkTake():
-        pass
-    
+        checkTake = True
+        if blockable(enemyx,enemyy,checkTake):
+            return True
+        else:
+            return False
 
 
-    checkList = [checkEscape(),checkBlock(),checkTake()]
+    checkList = [checkEscape(),checkBlock()]
+    print(checkList,'..checklist')
     if True not in checkList:
         return True
     else:
