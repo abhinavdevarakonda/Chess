@@ -1,4 +1,6 @@
+from os import kill
 import time
+from tkinter import Checkbutton
 import pygame
 import math
 
@@ -18,6 +20,12 @@ HIGHLIGHT = (255,255,0)
 game_over = [False]
 white_in_check = False
 black_in_check = False
+white_king_moves=0
+black_king_moves=0
+left_wr_moves=0
+right_wr_moves=0
+left_br_moves=0
+right_br_moves=0
 square_size = 80
 check = [False]
 highlight = [False]
@@ -332,6 +340,54 @@ def IsEmpty(initial_x,initial_y,final_x,final_y):
                         if i != ' ':
                             valid = False
         return valid
+def has_white_king_moved():
+    global white_king_moves
+    if(board[7][4]!="wk"):
+        white_king_moves=white_king_moves+1
+    if(white_king_moves!=0):
+        return True
+    else:
+        return False
+def has_black_king_moved():
+    global black_king_moves
+    if(board[0][4]!="bk"):
+        black_king_moves=black_king_moves+1
+    if(black_king_moves!=0):
+        return True
+    else:
+        return False
+def has_left_wr_moved():
+    global left_wr_moves
+    if(board[7][0]!="wr1"):
+        left_wr_moves=left_wr_moves+1
+    if(left_wr_moves!=0):
+        return True
+    else:
+        return False
+def has_right_wr_moved():
+    global right_wr_moves
+    if(board[7][7]!="wr2"):
+        right_wr_moves=right_wr_moves+1
+    if(right_wr_moves!=0):
+        return True
+    else:
+        return False
+def has_left_br_moved():
+    global left_br_moves
+    if(board[0][0]!="br1"):
+        left_br_moves=left_br_moves+1
+    if(left_br_moves!=0):
+        return True
+    else:
+        return False
+def has_right_br_moved():
+    global right_br_moves
+    if(board[0][7]!="br2"):
+        right_br_moves=right_br_moves+1
+    if(right_br_moves!=0):
+        return True
+    else:
+        return False   
     
 def move(initial_coords,final_coords):
     global turns
@@ -480,7 +536,7 @@ def move(initial_coords,final_coords):
         if((math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==1) or (math.fabs(final_x-initial_x)==0 and math.fabs(final_y-initial_y)==1) or (math.fabs(final_x-initial_x)==1 and math.fabs(final_y-initial_y)==0)):
             if IsEmpty(initial_x, initial_y, final_x, final_y):
                 movement(initial_x,initial_y,final_x,final_y)
-
+    print("piece: ",board[initial_x][initial_y])
     #if pawn first move
     if board[initial_x][initial_y][0] == 'w' and board[initial_x][initial_y][1] == 'p' and initial_x==6:
         white_pawn_first_move(initial_x,initial_y,final_x,final_y)
@@ -508,6 +564,43 @@ def move(initial_coords,final_coords):
     
     elif board[initial_x][initial_y][1] == 'k'and len(board[initial_x][initial_y])==2:
         king_move(initial_x,initial_y,final_x,final_y)
+    #whitecastling
+    if board[initial_x][initial_y]=="wk"and final_x==7 and final_y==2 and has_white_king_moved()==False and has_left_wr_moved()==False and board[7][1]==' 'and board[7][2]==' 'and board[7][3]==' ':
+        board[7][2]="wk"
+        board[7][3]="wr1"
+        board[7][4]=' '
+        board[7][0]=' '
+        Board()
+        turns+=1
+        #return
+    if board[initial_x][initial_y]=="wk"and final_x==7 and final_y==6 :
+        if has_white_king_moved()==False and has_right_wr_moved()==False and board[7][5]==' 'and board[7][6]==' ':
+            board[7][6]="wk"
+            board[7][5]="wr2"
+            board[7][4]=' ' 
+            board[7][7]=' ' 
+            Board()
+            turns+=1
+            #return
+    #blackcastling
+    if board[initial_x][initial_y]=="bk"and board[final_x][final_y]==board[0][2] and has_black_king_moved()==False and has_left_br_moved()==False and board[0][1]==" "and board[0][2]==" "and board[0][3]==" ":
+        board[0][2]="bk"
+        board[0][3]="br1"
+        board[0][4]=" "
+        board[0][0]=" "
+        Board()
+        turns+=1
+        #return
+    if board[initial_x][initial_y]=="bk"and board[final_x][final_y]==board[0][6] and has_black_king_moved()==False and has_right_br_moved()==False and board[0][5]==" "and board[0][6]==" ":
+        board[0][6]="bk"
+        board[0][5]="br2"
+        board[0][4]=" "
+        board[0][7]=" "
+        Board()
+        turns+=1
+        #return
+    
+    
     
 
 def Check(board,MovingPiece):
@@ -586,6 +679,7 @@ def Check(board,MovingPiece):
                     break
             i,j = x,y
             while (i>=0 and j>=0) or k==1:
+                print(board[i][j],'..as')
                 if board[i][j] == 'bk' or board[i][j] == 'wk':
                     i-=1
                     j-=1
@@ -624,6 +718,7 @@ def Check(board,MovingPiece):
                 else:
                     break
             return False
+        
 
         if side(white_kingx,white_kingy,'bb'):
             return 'white'
@@ -702,6 +797,7 @@ def Check(board,MovingPiece):
         return rook_check() 
     else:
         return False
+    
 
 def CheckMate(board,MovingPiece,king):
     #conditions for checkmate:
@@ -724,6 +820,7 @@ def CheckMate(board,MovingPiece,king):
         if kingx>0 and fake_board[kingx-1][kingy]==' ': 
             fake_board[kingx-1][kingy] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
+            print('1')
             if Check(fake_board,MovingPiece) == False:
                 return True
         #down
@@ -731,6 +828,7 @@ def CheckMate(board,MovingPiece,king):
         if kingx<7 and fake_board[kingx+1][kingy]==' ':
             fake_board[kingx+1][kingy] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
+            print('2')
             if Check(fake_board,MovingPiece) == False:
                 return True
         #left
@@ -738,6 +836,7 @@ def CheckMate(board,MovingPiece,king):
         if kingy>0 and fake_board[kingx][kingy-1]==' ':
             fake_board[kingx][kingy-1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
+            print('3')
             if Check(fake_board,MovingPiece) == False:
                 return True
         #right
@@ -745,14 +844,15 @@ def CheckMate(board,MovingPiece,king):
         if kingy<7 and fake_board[kingx][kingy+1]==' ':
             fake_board[kingx][kingy+1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
+            print('4')
             if Check(fake_board,MovingPiece) == False:
                 return True
-
         #upleft
         fake_board = [i[:] for i in board]
         if kingx>0 and kingy>0 and fake_board[kingx-1][kingy-1]==' ':
             fake_board[kingx-1][kingy-1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
+            print('5')
             if Check(fake_board,MovingPiece) == False:
                 return True
         #upright
@@ -760,6 +860,7 @@ def CheckMate(board,MovingPiece,king):
         if kingx>0 and kingy<7 and fake_board[kingx-1][kingy+1]==' ':
             fake_board[kingx-1][kingy+1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
+            print('6')
             if Check(fake_board,MovingPiece) == False:
                 return True
         #downleft
@@ -767,6 +868,7 @@ def CheckMate(board,MovingPiece,king):
         if kingx<7 and kingy>0 and fake_board[kingx+1][kingy-1]==' ':
             fake_board[kingx+1][kingy-1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
+            print('7')
             if Check(fake_board,MovingPiece) == False:
                 return True
         #downright
@@ -774,9 +876,9 @@ def CheckMate(board,MovingPiece,king):
         if kingx<7 and kingy<7 and fake_board[kingx+1][kingy+1]==' ':
             fake_board[kingx+1][kingy+1] = fake_board[kingx][kingy]
             fake_board[kingx][kingy] = ' '
+            print('8')
             if Check(fake_board,MovingPiece) == False:
                 return True     
-
         return False
         
             
@@ -1001,7 +1103,7 @@ def CheckMate(board,MovingPiece,king):
         else:
             return False
 
-
+    #print(checkEscape())
     checkList = [checkEscape(),checkBlock()]
     print(checkList,'..checklist')
     if True not in checkList:
@@ -1069,7 +1171,8 @@ while running:
                         killing_piece = fake_board[initial_coordinates[0]][initial_coordinates[1]]
                         fake_board[clicked_coords[0]][clicked_coords[1]] = killing_piece
                         fake_board[initial_coordinates[0]][initial_coordinates[1]] = ' '
-                        
+                        for i in fake_board:
+                            print(i)
                         if Check(fake_board,killing_piece) == 'black':
                             check = [True,clicked_coords[0],clicked_coords[1],'bk']
                             print('black is under check')
@@ -1086,6 +1189,8 @@ while running:
                         elif Check(fake_board,killing_piece) == 'white':
                             check = [True,clicked_coords[0],clicked_coords[1],'wk']
                             print('white is under check')
+                            print(CheckMate(fake_board,killing_piece,'wk'))
+                            print(killing_piece,'..kill')
                             if CheckMate(fake_board,killing_piece,'wk'):
                                 print('checkmate! Black wins!4')
                                 game_over = [True,'black']
@@ -1093,7 +1198,7 @@ while running:
                         else:
                             check = [False]
                         
-
+                        
                         print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
                             
                         if Check(fake_board, MovingPiece) == 'black' and turns%2!=0:
@@ -1153,7 +1258,7 @@ while running:
                 pass
                 
             #for i in board:
-            #    print(i)
+             #   print(i)
 
 
 
