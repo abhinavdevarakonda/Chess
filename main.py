@@ -9,6 +9,7 @@ WIDTH = 800
 pygame.init()
 
 
+
 GameDisplay = pygame.display.set_mode((800,800))
 
 #############INITIAL BOARD DRAWING######################
