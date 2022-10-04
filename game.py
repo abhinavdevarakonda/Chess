@@ -3,6 +3,8 @@ import time
 from tkinter import Checkbutton
 import pygame
 import math
+import socket
+import pickle
 
 HEIGHT = 800
 WIDTH = 800
