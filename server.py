@@ -1,41 +1,37 @@
 import socket
+import os
 from _thread import *
-import pickle
 
+serverSocket = socket.socket()
 host = "127.0.0.1"
-port = 55555
-FORMAT = 'ascii'
-server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-server.bind((host,port))
-server.listen(2)
-YOUR_TURN = "YOUR_TURN"
-turns = 0
-clients,names = [],[]
+port = 5555
+threadCount = 0
 
-def send_board(msg):
-    for client in clients:
-        client.send(msg)
+#connecting host and port to server
+try:
+    serverSocket.bind((host,port))
+except socket.error as e:
+    print(str(e))
 
-def handle(client):
-    turns = 0
+print(f"LISTENING ON {serverSocket}")
+serverSocket.listen(5)
+
+def multi_threaded_client(connection):
+    connection.send(str.encode("server is working"))
     while True:
-        try:
-            if turns%2==0:
-                clients[0].send("__WHITE MOVE__".encode(FORMAT))
-                msg = clients[0].recv(1024)
-                send_board(msg)
-            else:
-                clients[1].send("__BLACK MOVE__".encode(FORMAT))
-                msg = clients[1].recv(1024)
-                send_board(msg)
-
-            turns+=1
-        
-        except:
-            index = clients.index(client)
-            name = names[index]
-            names.remove(nickname)
-            clients.remove(index)
-            client.close()
-            send_board(f"{name} has left the chat".encode(FORMAT))
+        data = connection.recv(2048)
+        response = "server message: " + data.decode('utf-8')
+        if not data:
             break
+
+        connection.sendall(str.encode(response))
+    connection.close()
+
+while True:
+    Client, addr = serverSocket.accept()
+    print("CONNECTED TO: " + addr[0] + ":" + str(addr[1]))
+    start_new_thread(multi_threaded_client, (Client, ))
+    threadCount += 1
+    print("thread number: " + str(threadCount))
+
+serverSocket.close()
