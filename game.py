@@ -5,26 +5,6 @@ import pygame
 import math
 
 #############################
-#socket programming part:
-import socket
-import pickle
-
-clientSocket = socket.socket()
-host = "127.0.0.1"
-port = 5555
-print("waiting for connection response from server")
-try:
-    clientSocket.connect((host,port))
-except socket.error as e:
-    print(str(e))
-
-res = clientSocket.recv(1024)
-while True:
-    clientInput = input('CONNECTED')
-    clientSocket.send(str.encode(clientInput))
-    print(res.decode('utf-8'))
-clientSocket.close()
-###############################
 
 HEIGHT = 800
 WIDTH = 800
