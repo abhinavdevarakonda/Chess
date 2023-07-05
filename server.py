@@ -1,74 +1,71 @@
 import socket
 import select
-import json
 
 # Create a server socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
+# Define the server address and port
 server_address = ('localhost', 5555)
 
+# Bind the server socket to the specified address and port
 server_socket.bind(server_address)
 
-server_socket.listen(2)  # max 2 players
+# Listen for incoming connections
+server_socket.listen(2)  # Allow up to two players
 
+# Maintain a list of connected clients and their respective teams
 clients = []
-active_player = None
+teams = ["white", "black"]
+team_index = 0
 
-print("server started. waiting for players...")
-main_board = []
+print("Server started. Waiting for connections...")
 
 def broadcast(message, sender_socket):
+    """Send a message to all connected clients except the sender."""
     for client in clients:
         if client != sender_socket:
             client.send(message)
 
 while True:
+    # Wait for activity on the server socket and connected client sockets
     sockets_list = [server_socket] + clients
     read_sockets, _, _ = select.select(sockets_list, [], [])
 
     for sock in read_sockets:
+        # New connection request received
         if sock == server_socket:
             client_socket, client_address = server_socket.accept()
             clients.append(client_socket)
-            print(f"{client_address} connected.")
+            print(f"New connection from {client_address}")
 
-            welcome_message = {"message": "welcome!"}
-            client_socket.send(json.dumps(welcome_message).encode())
-
-            if not active_player:
-                # first player to connect starts first (white)
-                active_player = client_socket
-                active_player.send(json.dumps({"message": "Your turn"}).encode())
+            # Assign team to the client
+            if team_index < len(teams):
+                team = teams[team_index]
+                team_index += 1
+                client_socket.send(team.encode())
             else:
-                # tell the other player it's not their turn
-                client_socket.send(json.dumps({"message": "Waiting for opponent's move"}).encode())
+                client_socket.send("The game is already full. Try again later.".encode())
+                clients.remove(client_socket)
+                client_socket.close()
+                continue
 
+            # Send a notification to all clients about the new team assignment
+            broadcast(f"{team.capitalize()} team joined the game.", client_socket)
+
+            # TODO: Handle game initialization
+
+        # Incoming data from a client
         else:
             try:
-                data = sock.recv(4096).decode()
+                data = sock.recv(4096)
                 if data:
-                    received_list = json.loads(data)
-                    main_board.append(received_list)
-                    print(main_board)
-
-                    # TODO: Process the received list object
-                    # Example: Update the game state based on the received move
-
-                    broadcast(json.dumps(received_list).encode(), sock)
-
-                    if sock == active_player:
-                        # change turn 
-                        active_player = next((client for client in clients if client != active_player), None)
-                        if active_player:
-                            active_player.send(json.dumps({"message": "Your turn"}).encode())
+                    # TODO: Process the received data (e.g., chess moves)
+                    broadcast(data, sock)  # Send the move to all other clients
             except:
                 print(f"Client {sock.getpeername()} disconnected")
                 sock.close()
                 clients.remove(sock)
-                if sock == active_player:
-                    active_player = None
                 continue
 
-# Close the server socket
 server_socket.close()

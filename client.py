@@ -1,3 +1,4 @@
+#import game
 import socket
 import json
 
@@ -16,11 +17,8 @@ while True:
 
         if message['message'] == 'Your turn':
             # TODO: Implement logic to get the player's move
-            my_move = []
-            for i in range(3):
-                ele = int(input("enter element:\n"))
-                my_move.append(ele)
-
+            # my_move = game.board
+            my_move = ['message']
             serialized_move = json.dumps(my_move)
 
             # send to server
