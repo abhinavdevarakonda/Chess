@@ -1,5 +1,8 @@
 import socket
 import select
+import json
+import pickle
+from pprint import pprint
 
 # Create a server socket
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -25,7 +28,7 @@ def broadcast(message, sender_socket):
     """Send a message to all connected clients except the sender."""
     for client in clients:
         if client != sender_socket:
-            client.send(message)
+            client.send(pickle.dumps(message))
 
 while True:
     # Wait for activity on the server socket and connected client sockets
@@ -50,17 +53,14 @@ while True:
                 client_socket.close()
                 continue
 
-            # Send a notification to all clients about the new team assignment
-            broadcast(f"{team.capitalize()} team joined the game.", client_socket)
-
-            # TODO: Handle game initialization
 
         # Incoming data from a client
         else:
             try:
                 data = sock.recv(4096)
                 if data:
-                    # TODO: Process the received data (e.g., chess moves)
+                    for i in pickle.loads(data):
+                        print(i)
                     broadcast(data, sock)  # Send the move to all other clients
             except:
                 print(f"Client {sock.getpeername()} disconnected")

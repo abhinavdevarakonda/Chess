@@ -3,8 +3,10 @@ import time
 import pygame
 import math
 import socket
+import pickle
 import json
-#shrihari kulkarni 21BBS0084 from vit, vellore abhinavkondas husband was here
+import select
+from pprint import pprint
 #############################
 client_socket  = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 server_address = ('localhost',5555)
@@ -108,6 +110,7 @@ board[0] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
 board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
 
 def Board():
+    displayBoard = [i[:] for i in board]
     GameDisplay .fill(WHITE)
     k=0
     for i in range(1,9):
@@ -134,34 +137,34 @@ def Board():
 
     for i in range(8):
         for j in range(8):
-            if board[i][j][:2] == 'br':
+            if displayBoard[i][j][:2] == 'br':
                 GameDisplay.blit(black_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:2] == 'wr':
+            elif displayBoard[i][j][:2] == 'wr':
                 GameDisplay.blit(white_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
 
-            elif board[i][j][:3] == 'bkn':
+            elif displayBoard[i][j][:3] == 'bkn':
                 GameDisplay.blit(black_knight_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:3] == 'wkn':
+            elif displayBoard[i][j][:3] == 'wkn':
                 GameDisplay.blit(white_knight_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
             
-            elif board[i][j][:2] == 'bb':
+            elif displayBoard[i][j][:2] == 'bb':
                 GameDisplay.blit(black_bishop_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:2] == 'wb':
+            elif displayBoard[i][j][:2] == 'wb':
                 GameDisplay.blit(white_bishop_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
             
-            elif board[i][j][:2] == 'bq':
+            elif displayBoard[i][j][:2] == 'bq':
                 GameDisplay.blit(black_queen_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:2] == 'wq':
+            elif displayBoard[i][j][:2] == 'wq':
                 GameDisplay.blit(white_queen_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
             
-            elif board[i][j][:2] == 'bk':
+            elif displayBoard[i][j][:2] == 'bk':
                 GameDisplay.blit(black_king_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:2] == 'wk':
+            elif displayBoard[i][j][:2] == 'wk':
                 GameDisplay.blit(white_king_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
             
-            elif board[i][j][:2] == 'bp':
+            elif displayBoard[i][j][:2] == 'bp':
                 GameDisplay.blit(black_pawn_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))   
-            elif board[i][j][:2] == 'wp':
+            elif displayBoard[i][j][:2] == 'wp':
                 GameDisplay.blit(white_pawn_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
 
 def blackBoard():
@@ -464,6 +467,7 @@ def move(initial_coords,final_coords):
         board[final_x][final_y]=' '
         board[final_x][final_y]=board[initial_x][initial_y]
         board[initial_x][initial_y]=' ' 
+        send_move()
         Board()
     def black_captures(initial_x,initial_y,final_x,final_y):
         white_captured_pieces=[]
@@ -471,6 +475,7 @@ def move(initial_coords,final_coords):
         board[final_x][final_y]=' '
         board[final_x][final_y]=board[initial_x][initial_y]
         board[initial_x][initial_y]=' '
+        send_move()
         Board()
     if((board[initial_x][initial_y][:2]=='wp')and(initial_x-final_x==1)and((math.fabs(initial_y-final_y))==1)and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
@@ -628,6 +633,8 @@ def move(initial_coords,final_coords):
     if board[initial_x][initial_y]=="bk"and board[final_x][final_y]==board[0][6] and has_black_king_moved()==False and has_right_br_moved()==False and board[0][5]==" "and board[0][6]==" ":
         black_castle_right()
         #return
+    
+    send_move()
     
     
     
@@ -1168,15 +1175,50 @@ step = 0
 turns = 0
 Board()
 
+def send_move():
+    move = pickle.dumps(board)
+    client_socket.send(move)
+
+def receive_move():
+    pass
+
 try:
     client_socket.connect(server_address)
 
     team = client_socket.recv(4096).decode()
     print(team)
     if team == 'black':
-        blackBoard()
+        turns += 1
+
+        try:
+           game_state_bytes = client_socket.recv(4096)
+           print('here')
+           if game_state_bytes:
+                game_state = pickle.loads(game_state_bytes)
+                print(pickle.loads(game_state))
+                board = pickle.loads(game_state)
+                Board()
+        except:
+            pass
+
+
+    Board()
 
     while running:
+        
+        client_socket.setblocking(0)
+        ready_to_read, _, _ = select.select([client_socket], [], [], 0.1)
+        if client_socket in ready_to_read:
+            game_state = client_socket.recv(4096)
+            if game_state:
+                print('here2')
+                game_state = pickle.loads(game_state)
+                game_state = pickle.loads(game_state)
+                board = game_state
+                Board()
+                pprint(board)
+                turns += 1 
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -1219,7 +1261,7 @@ try:
                                 check = [True,clicked_coords[0],clicked_coords[1],'bk']
                                 print('black is under check')
                                 if CheckMate(fake_board,killing_piece,'bk'):
-                                    print('checkmate! White wins!3')
+                                    print('checkmate! White wins!')
                                     game_over = [True,'white']
                                     
                                     white_win_img=pygame.image.load('pieces/white_win.jpg')
@@ -1255,11 +1297,6 @@ try:
                                 if move(initial_coordinates,clicked_coords):
                                     step = 0
                                     turns += 1
-                            
-                            move = board
-                            client_socket.send(move.encode())
-                            game_state = client_socket.recv(4096).decode()
-
 
                     elif item == ' ' and step == 1:
                         
@@ -1296,11 +1333,16 @@ try:
                         else:
                             check = [False]
                             move(initial_coordinates,clicked_coords)
+                            #send_move()
+
+                            
+
 
                             step = 0
                             #turns += 1
                     if game_over[0]:
                         displayWinner(game_over[1])
+
                 except IndexError:
                     pass
                     
