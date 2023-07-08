@@ -64,6 +64,7 @@ while True:
                     broadcast(data, sock)  # Send the move to all other clients
             except:
                 print(f"Client {sock.getpeername()} disconnected")
+                team_index -= 1
                 sock.close()
                 clients.remove(sock)
                 continue

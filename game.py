@@ -112,6 +112,11 @@ board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
 def Board():
     displayBoard = [i[:] for i in board]
     GameDisplay .fill(WHITE)
+
+    if team == "black":
+        for i in range(8):
+            for j in range(8):
+                displayBoard[i][8-1-j] = board[8-1-i][j]
     k=0
     for i in range(1,9):
         for j in range(1,9):
