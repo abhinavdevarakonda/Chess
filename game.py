@@ -1,9 +1,16 @@
 from os import kill
 import time
-from tkinter import Checkbutton
 import pygame
 import math
-
+import socket
+import pickle
+import json
+import select
+from pprint import pprint
+#############################
+client_socket  = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+server_address = ('localhost',5555)
+#############################
 HEIGHT = 800
 WIDTH = 800
 pygame.init()
@@ -103,7 +110,13 @@ board[0] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
 board[7] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
 
 def Board():
+    displayBoard = [i[:] for i in board]
     GameDisplay .fill(WHITE)
+
+    if team == "black":
+        for i in range(8):
+            for j in range(8):
+                displayBoard[i][8-1-j] = board[8-1-i][j]
     k=0
     for i in range(1,9):
         for j in range(1,9):
@@ -129,35 +142,43 @@ def Board():
 
     for i in range(8):
         for j in range(8):
-            if board[i][j][:2] == 'br':
+            if displayBoard[i][j][:2] == 'br':
                 GameDisplay.blit(black_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:2] == 'wr':
+            elif displayBoard[i][j][:2] == 'wr':
                 GameDisplay.blit(white_rook_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
 
-            elif board[i][j][:3] == 'bkn':
+            elif displayBoard[i][j][:3] == 'bkn':
                 GameDisplay.blit(black_knight_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:3] == 'wkn':
+            elif displayBoard[i][j][:3] == 'wkn':
                 GameDisplay.blit(white_knight_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
             
-            elif board[i][j][:2] == 'bb':
+            elif displayBoard[i][j][:2] == 'bb':
                 GameDisplay.blit(black_bishop_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:2] == 'wb':
+            elif displayBoard[i][j][:2] == 'wb':
                 GameDisplay.blit(white_bishop_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
             
-            elif board[i][j][:2] == 'bq':
+            elif displayBoard[i][j][:2] == 'bq':
                 GameDisplay.blit(black_queen_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:2] == 'wq':
+            elif displayBoard[i][j][:2] == 'wq':
                 GameDisplay.blit(white_queen_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
             
-            elif board[i][j][:2] == 'bk':
+            elif displayBoard[i][j][:2] == 'bk':
                 GameDisplay.blit(black_king_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
-            elif board[i][j][:2] == 'wk':
+            elif displayBoard[i][j][:2] == 'wk':
                 GameDisplay.blit(white_king_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
             
-            elif board[i][j][:2] == 'bp':
+            elif displayBoard[i][j][:2] == 'bp':
                 GameDisplay.blit(black_pawn_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))   
-            elif board[i][j][:2] == 'wp':
+            elif displayBoard[i][j][:2] == 'wp':
                 GameDisplay.blit(white_pawn_img,((j+1)*HEIGHT/10,(i+1)*WIDTH/10))
+
+def blackBoard():
+    for i in range(8):
+        board[1][i] = white_pawns[i]
+        board[6][i] = black_pawns[i]
+
+    board[7] = ['br1','bkn1','bb1','bq','bk','bb2','bkn2','br2']
+    board[0] = ['wr1','wkn1','wb1','wq','wk','wb2','wkn2','wr2']
 
 
 def IsEmpty(initial_x,initial_y,final_x,final_y):
@@ -443,7 +464,7 @@ def move(initial_coords,final_coords):
             if(count==0) and(path[len(path)-1]!=' '):
                 possible=True
         return possible
-     
+    
     def white_captures(initial_x,initial_y,final_x,final_y):
         global turns
         black_captured_pieces=[]
@@ -451,6 +472,7 @@ def move(initial_coords,final_coords):
         board[final_x][final_y]=' '
         board[final_x][final_y]=board[initial_x][initial_y]
         board[initial_x][initial_y]=' ' 
+        send_move()
         Board()
     def black_captures(initial_x,initial_y,final_x,final_y):
         white_captured_pieces=[]
@@ -458,6 +480,7 @@ def move(initial_coords,final_coords):
         board[final_x][final_y]=' '
         board[final_x][final_y]=board[initial_x][initial_y]
         board[initial_x][initial_y]=' '
+        send_move()
         Board()
     if((board[initial_x][initial_y][:2]=='wp')and(initial_x-final_x==1)and((math.fabs(initial_y-final_y))==1)and(board[final_x][final_y]!='bk')):
         if board[final_x][final_y]!=' ':
@@ -616,6 +639,8 @@ def move(initial_coords,final_coords):
         black_castle_right()
         #return
     
+    send_move()
+    
     
     
 
@@ -679,7 +704,7 @@ def Check(board,MovingPiece):
             return 'white'
         else:
             return False
-      
+    
     def bishop_check():
         def side(x,y,enemy):
             k = 0
@@ -748,7 +773,7 @@ def Check(board,MovingPiece):
             return 'black'
         else:
             return False
-  
+
     def rook_check():
         def side(x,y,enemy):
             i,j = x,y 
@@ -1154,134 +1179,195 @@ running = True
 step = 0
 turns = 0
 Board()
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+
+def send_move():
+    move = pickle.dumps(board)
+    client_socket.send(move)
+
+def receive_move():
+    pass
+
+try:
+    client_socket.connect(server_address)
+
+    team = client_socket.recv(4096).decode()
+    print(team)
+    if team == 'black':
+        turns += 1
+
+        try:
+           game_state_bytes = client_socket.recv(4096)
+           print('here')
+           if game_state_bytes:
+                game_state = pickle.loads(game_state_bytes)
+                print(pickle.loads(game_state))
+                board = pickle.loads(game_state)
+                Board()
+        except:
+            pass
+
+
+    Board()
+
+    while running:
         
-        if event.type == pygame.MOUSEBUTTONUP:
-            #print(turns)
-            mouse_position = pygame.mouse.get_pos()
-            clicked_coords = ClickedSquare(mouse_position)
+        client_socket.setblocking(0)
+        ready_to_read, _, _ = select.select([client_socket], [], [], 0.1)
+        if client_socket in ready_to_read:
+            game_state = client_socket.recv(4096)
+            if game_state:
+                print('here2')
+                game_state = pickle.loads(game_state)
+                game_state = pickle.loads(game_state)
+                board = game_state
+                Board()
+                pprint(board)
+                turns += 1 
 
-            try:
-                item = board[clicked_coords[0]][clicked_coords[1]]
-                if clicked_coords[0] < 0 or clicked_coords[1] < 0:
-                    pass
-                elif item != ' ' and step==0:
-                    if (turns%2==0 and board[clicked_coords[0]][clicked_coords[1]][0] == 'w')or(turns%2==1 and board[clicked_coords[0]][clicked_coords[1]][0] == 'b'):
-                        initial_coordinates = clicked_coords
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            
+            if event.type == pygame.MOUSEBUTTONUP:
+                #print(turns)
+                mouse_position = pygame.mouse.get_pos()
+                clicked_coords = ClickedSquare(mouse_position)
+
+                try:
+                    item = board[clicked_coords[0]][clicked_coords[1]]
+                    if clicked_coords[0] < 0 or clicked_coords[1] < 0:
+                        pass
+                    elif item != ' ' and step==0:
+                        if (turns%2==0 and board[clicked_coords[0]][clicked_coords[1]][0] == 'w')or(turns%2==1 and board[clicked_coords[0]][clicked_coords[1]][0] == 'b'):
+                            initial_coordinates = clicked_coords
+                            MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
+                        
+                            highlight = [True,clicked_coords[0],clicked_coords[1]]
+                            Board()
+                            highlight = [False]
+                            step = 1
+                    elif item !=' ' and step==1:
+                        #if the piece they clicked on is of same colour as their initial click
                         MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
-                     
-                        highlight = [True,clicked_coords[0],clicked_coords[1]]
-                        Board()
-                        highlight = [False]
-                        step = 1
-                elif item !=' ' and step==1:
-                    #if the piece they clicked on is of same colour as their initial click
-                    MovingPiece = board[clicked_coords[0]][clicked_coords[1]]
-                    if MovingPiece[0] == board[initial_coordinates[0]][initial_coordinates[1]][0]:
-                        initial_coordinates = clicked_coords
-                        highlight = [True,clicked_coords[0],clicked_coords[1]]
-                        Board()
-                        highlight = [False]
-                    #this is if they try to capture a piece (click on their piece and then the enemy piece)
-                    else:
-                        fake_board = [i[:] for i in board]
-                        killing_piece = fake_board[initial_coordinates[0]][initial_coordinates[1]]
-                        fake_board[clicked_coords[0]][clicked_coords[1]] = killing_piece
-                        fake_board[initial_coordinates[0]][initial_coordinates[1]] = ' '
-                        for i in board:
-                            print(i)
-                        if Check(fake_board,killing_piece) == 'black':
-                            check = [True,clicked_coords[0],clicked_coords[1],'bk']
-                            print('black is under check')
-                            if CheckMate(fake_board,killing_piece,'bk'):
-                                print('checkmate! White wins!3')
-                                game_over = [True,'white']
-                                
-                                white_win_img=pygame.image.load('pieces/white_win.jpg')
-                                white_win_img=pygame.transform.scale(white_win_img,(80,80))
-                                GameDisplay.blit(white_win_img,(HEIGHT//2,WIDTH//2))
-                                game_over = [True,'white']
-                                
-
-                        elif Check(fake_board,killing_piece) == 'white':
-                            check = [True,clicked_coords[0],clicked_coords[1],'wk']
-                            print('white is under check')
-                            for i in fake_board:
-                                print(i)
-                            if CheckMate(fake_board,killing_piece,'wk'):
-                                print('checkmate! Black wins!4')
-                                game_over = [True,'black']
-                                
+                        if MovingPiece[0] == board[initial_coordinates[0]][initial_coordinates[1]][0]:
+                            initial_coordinates = clicked_coords
+                            highlight = [True,clicked_coords[0],clicked_coords[1]]
+                            Board()
+                            highlight = [False]
+                        #this is if they try to capture a piece (click on their piece and then the enemy piece)
                         else:
-                            check = [False]
-                        
-                        
-                        print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
+                            fake_board = [i[:] for i in board]
+                            killing_piece = fake_board[initial_coordinates[0]][initial_coordinates[1]]
+                            fake_board[clicked_coords[0]][clicked_coords[1]] = killing_piece
+                            fake_board[initial_coordinates[0]][initial_coordinates[1]] = ' '
+                            for i in board:
+                                print(i)
+                            if Check(fake_board,killing_piece) == 'black':
+                                check = [True,clicked_coords[0],clicked_coords[1],'bk']
+                                print('black is under check')
+                                if CheckMate(fake_board,killing_piece,'bk'):
+                                    print('checkmate! White wins!')
+                                    game_over = [True,'white']
+                                    
+                                    white_win_img=pygame.image.load('pieces/white_win.jpg')
+                                    white_win_img=pygame.transform.scale(white_win_img,(80,80))
+                                    GameDisplay.blit(white_win_img,(HEIGHT//2,WIDTH//2))
+                                    game_over = [True,'white']
+                                    
+
+                            elif Check(fake_board,killing_piece) == 'white':
+                                check = [True,clicked_coords[0],clicked_coords[1],'wk']
+                                print('white is under check')
+                                for i in fake_board:
+                                    print(i)
+                                if CheckMate(fake_board,killing_piece,'wk'):
+                                    print('checkmate! Black wins!4')
+                                    game_over = [True,'black']
+                                    
+                            else:
+                                check = [False]
                             
+                            
+                            print(board[initial_coordinates[0]][initial_coordinates[1]],' captures ',board[clicked_coords[0]][clicked_coords[1]])
+                                
+                            if Check(fake_board, MovingPiece) == 'black' and turns%2!=0:
+                                print('black moving into check')
+                                print('black is under check')    
+                                step = 0
+                            elif Check(fake_board,MovingPiece) == 'white' and turns%2==0:
+                                print('white moving into check')
+                                print('white is under check')
+                                step = 0
+                            else:
+                                if move(initial_coordinates,clicked_coords):
+                                    step = 0
+                                    turns += 1
+
+                    elif item == ' ' and step == 1:
+                        
+                        fake_board = [i[:] for i in board]
+                        fake_board[clicked_coords[0]][clicked_coords[1]] = MovingPiece
+                        fake_board[initial_coordinates[0]][initial_coordinates[1]] = ' '
+
+                        #so that team cannot move into checking itself
                         if Check(fake_board, MovingPiece) == 'black' and turns%2!=0:
-                            print('black moving into check')
                             print('black is under check')    
                             step = 0
                         elif Check(fake_board,MovingPiece) == 'white' and turns%2==0:
-                            print('white moving into check')
                             print('white is under check')
                             step = 0
+
+                        elif Check(fake_board,MovingPiece) == 'black' and turns%2==0:
+                            print('black is under check')
+                            check = [True,clicked_coords[0],clicked_coords[1],'bk']
+                            move(initial_coordinates,clicked_coords)
+                            if CheckMate(fake_board, MovingPiece,'bk'):
+                                print('checkmate! White wins!1')
+                                game_over = [True,'white']
+                            step = 0
+                            #turns += 1
+                        elif Check(fake_board,MovingPiece) == 'white' and turns%2!=0:
+                            print('white is under check')
+                            check = [True,clicked_coords[0],clicked_coords[1],'wk']
+                            move(initial_coordinates,clicked_coords)
+                            if CheckMate(fake_board, MovingPiece,'wk'):
+                                print('checkmate! Black wins!2')
+                                game_over = [True,'black']
+                            step = 0
+                            #turns += 1
                         else:
-                            if move(initial_coordinates,clicked_coords):
-                                step = 0
-                                turns += 1
+                            check = [False]
+                            move(initial_coordinates,clicked_coords)
+                            #send_move()
 
-                elif item == ' ' and step == 1:
+                            
+
+
+                            step = 0
+                            #turns += 1
+                    if game_over[0]:
+                        displayWinner(game_over[1])
+
+                except IndexError:
+                    pass
                     
-                    fake_board = [i[:] for i in board]
-                    fake_board[clicked_coords[0]][clicked_coords[1]] = MovingPiece
-                    fake_board[initial_coordinates[0]][initial_coordinates[1]] = ' '
+                #for i in board:
+                #   print(i)
 
-                    #so that team cannot move into checking itself
-                    if Check(fake_board, MovingPiece) == 'black' and turns%2!=0:
-                        print('black is under check')    
-                        step = 0
-                    elif Check(fake_board,MovingPiece) == 'white' and turns%2==0:
-                        print('white is under check')
-                        step = 0
+        
+        pygame.display.update()
 
-                    elif Check(fake_board,MovingPiece) == 'black' and turns%2==0:
-                        print('black is under check')
-                        check = [True,clicked_coords[0],clicked_coords[1],'bk']
-                        move(initial_coordinates,clicked_coords)
-                        if CheckMate(fake_board, MovingPiece,'bk'):
-                            print('checkmate! White wins!1')
-                            game_over = [True,'white']
-                        step = 0
-                        #turns += 1
-                    elif Check(fake_board,MovingPiece) == 'white' and turns%2!=0:
-                        print('white is under check')
-                        check = [True,clicked_coords[0],clicked_coords[1],'wk']
-                        move(initial_coordinates,clicked_coords)
-                        if CheckMate(fake_board, MovingPiece,'wk'):
-                            print('checkmate! Black wins!2')
-                            game_over = [True,'black']
-                        step = 0
-                        #turns += 1
-                    else:
-                        check = [False]
-                        move(initial_coordinates,clicked_coords)
+        # move = json.dumps(board)
 
-                        step = 0
-                        #turns += 1
-                if game_over[0]:
-                    displayWinner(game_over[1])
-            except IndexError:
-                pass
-                
-            #for i in board:
-             #   print(i)
+        # client_socket.send(move.encode())
+
+        # game_state = client_socket.recv(4096).decode() 
+
+        # board = json.loads(game_state)
 
 
+except socket.error as e:
+    print(e)
 
-
-
-    pygame.display.update()
+finally:
+    client_socket.close()
